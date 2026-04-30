@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BGC Team - Camisetas</title>
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Animación de carga para el spinner */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        /* Ocultar elementos */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-800 font-sans pb-12">
+
+    <!-- Header -->
+    <header class="bg-white text-gray-900 py-6 shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex flex-col gap-2">
+                    <img src="https://i.imgur.com/m5xFiWX.png" alt="BGC Logo" class="h-14 w-auto object-contain self-start">
+                    <div>
+                        <p class="text-gray-800 text-xs font-bold tracking-[0.25em] mb-0.5">BASKETBALL</p>
+                        <p class="text-gray-500 text-sm">Gestión de Camisetas Oficiales</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-black">Valor: $24.990</p>
+                    <div class="mt-2 flex items-center justify-end gap-1.5 text-sm text-gray-500">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span>Sistema Online</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+        
+        <!-- Alerta de Error -->
+        <div id="error-alert" class="hidden bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 mb-6 border border-red-200">
+            <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+            <p id="error-message" class="text-sm"></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Columna Izquierda: Estadísticas y Formulario -->
+            <div class="md:col-span-1 space-y-6">
+                
+                <!-- Stats -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-3">Resumen</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Total Jugadores:</span>
+                            <span id="stat-total" class="font-bold text-lg">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Confirmados:</span>
+                            <span id="stat-confirmed" class="font-bold text-lg text-green-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Pendientes:</span>
+                            <span id="stat-pending" class="font-bold text-lg text-orange-500">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
+                        <i data-lucide="plus" class="text-black w-5 h-5"></i>
+                        Añadir Jugador
+                    </h3>
+                    <form id="add-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="hash" class="text-gray-400 w-4 h-4"></i>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    id="new-number"
+                                    required
+                                    class="w-full pl-10 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
+                                    placeholder="Ej: 10"
+                                >
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="user" class="text-gray-400 w-4 h-4"></i>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    id="new-name"
+                                    required
+                                    class="w-full pl-10 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
+                                    placeholder="Ej: Messi"
+                                >
+                            </div>
+                        </div>
+                        <button 
+                            type="submit"
+                            id="submit-btn"
+                            class="w-full bg-slate-900 hover:bg-slate-800 text-white p-3 rounded-lg font-medium transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+                        >
+                            <span id="submit-text">Agregar a la lista</span>
+                            <i data-lucide="refresh-cw" id="submit-spinner" class="w-4 h-4 hidden spinner"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Lista de Jugadores -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h2 class="font-bold text-lg text-slate-800">Lista de Pedidos</h2>
+                        <button 
+                            onclick="fetchData()"
+                            id="refresh-btn"
+                            class="text-gray-500 hover:text-black transition-colors p-2 disabled:opacity-50"
+                            title="Actualizar lista"
+                        >
+                            <i data-lucide="refresh-cw" id="refresh-icon" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="loading-state" class="p-12 text-center text-gray-500 flex flex-col items-center">
+                        <i data-lucide="refresh-cw" class="w-10 h-10 mb-4 text-gray-800 spinner"></i>
+                        <p>Cargando datos de la base...</p>
+                    </div>
+
+                    <div id="empty-state" class="p-12 text-center text-gray-500 hidden">
+                        <p>No hay jugadores en la lista aún.</p>
+                    </div>
+
+                    <ul id="players-list" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto hidden">
+                        <!-- Los jugadores se renderizarán aquí mediante JavaScript -->
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Lógica de la Aplicación -->
+    <script>
+        // INICIALIZACIÓN
+        lucide.createIcons();
+        
+        // URL de tu base de datos proporcionada
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxmS66GCT3QgEUeRtVaWiRnoco1I3605D23jo-PBQKGZTXab7Vi5AUl5yFnvaLTs9Ba/exec';
+        
+        let players = [];
+
+        // Elementos del DOM
+        const elList = document.getElementById('players-list');
+        const elLoading = document.getElementById('loading-state');
+        const elEmpty = document.getElementById('empty-state');
+        const elErrorAlert = document.getElementById('error-alert');
+        const elErrorMessage = document.getElementById('error-message');
+        const form = document.getElementById('add-form');
+
+        // Cargar datos al iniciar
+        window.onload = () => {
+            fetchData();
+        };
+
+        // Función para mostrar error
+        function showError(msg) {
+            elErrorMessage.innerHTML = msg;
+            elErrorAlert.classList.remove('hidden');
+            setTimeout(() => {
+                elErrorAlert.classList.add('hidden');
+            }, 8000); // Mostrar por 8 segundos
+        }
+
+        // Helper para procesar respuesta de Google y capturar errores de permisos
+        async function processGoogleResponse(response) {
+            const text = await response.text();
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error("Respuesta cruda del servidor:", text);
+                if (text.toLowerCase().includes("<!doctype html>")) {
+                    throw new Error("Error de permisos. Revisa en Google Apps Script que <b>'Quién tiene acceso'</b> esté en <b>'Cualquier persona'</b>. Google está pidiendo iniciar sesión.");
+                }
+                throw new Error("Respuesta inválida del servidor: " + text.substring(0, 50));
+            }
+        }
+
+        // Leer datos de la base
+        async function fetchData() {
+            setLoading(true);
+            try {
+                // Se agrega redirect: follow por si Google hace un 302 redirect
+                const response = await fetch(API_URL, { 
+                    method: 'GET',
+                    redirect: 'follow' 
+                });
+                
+                const data = await processGoogleResponse(response);
+                
+                if (data.error) throw new Error(data.error);
+                
+                // Ordenar por número
+                players = data.sort((a, b) => Number(a.numero) - Number(b.numero));
+                renderApp();
+            } catch (err) {
+                console.error(err);
+                showError('<strong>Error de conexión:</strong> ' + err.message);
+                elLoading.classList.add('hidden');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Actualizar UI
+        function renderApp() {
+            // Actualizar Estadísticas
+            const confirmedCount = players.filter(p => p.confirmado).length;
+
+            document.getElementById('stat-total').textContent = players.length;
+            document.getElementById('stat-confirmed').textContent = confirmedCount;
+            document.getElementById('stat-pending').textContent = players.length - confirmedCount;
+
+            // Renderizar Lista
+            elList.innerHTML = '';
+            
+            if (players.length === 0) {
+                elEmpty.classList.remove('hidden');
+                elList.classList.add('hidden');
+            } else {
+                elEmpty.classList.add('hidden');
+                elList.classList.remove('hidden');
+
+                players.forEach((player, index) => {
+                    const li = document.createElement('li');
+                    li.className = "p-4 hover:bg-gray-50 flex items-center justify-between transition-colors";
+                    
+                    const isConfirmed = player.confirmado === true || player.confirmado === "true" || player.confirmado === "TRUE";
+
+                    // Contenido del jugador
+                    li.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shrink-0">
+                                <span class="font-black text-slate-700 text-lg">${player.numero}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-lg capitalize">${player.nombre}</p>
+                                <p class="text-sm font-medium ${isConfirmed ? 'text-green-600' : 'text-orange-500'}">
+                                    ${isConfirmed ? '✓ Confirmado' : 'Pendiente'}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="action-container"></div>
+                    `;
+
+                    // Botón o Etiqueta de Confirmación
+                    const actionContainer = li.querySelector('.action-container');
+                    
+                    if (isConfirmed) {
+                        actionContainer.innerHTML = `
+                            <div class="flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                <span>Listo</span>
+                            </div>
+                        `;
+                    } else {
+                        const btn = document.createElement('button');
+                        btn.className = "flex items-center gap-2 bg-white border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 text-gray-600 px-4 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50 confirm-btn";
+                        btn.innerHTML = `
+                            <i data-lucide="circle" class="w-4 h-4 btn-icon"></i>
+                            <span class="btn-text">Confirmar</span>
+                        `;
+                        btn.onclick = () => handleConfirm(player.numero, player.nombre, btn);
+                        actionContainer.appendChild(btn);
+                    }
+
+                    elList.appendChild(li);
+                });
+            }
+            
+            // Re-renderizar iconos de Lucide insertados dinámicamente
+            lucide.createIcons();
+        }
+
+        // Confirmar jugador (escribir en base)
+        async function handleConfirm(numero, nombre, btnElement) {
+            // Estado visual de carga en el botón
+            btnElement.disabled = true;
+            btnElement.querySelector('.btn-icon').setAttribute('data-lucide', 'refresh-cw');
+            btnElement.querySelector('.btn-icon').classList.add('spinner');
+            btnElement.querySelector('.btn-text').textContent = 'Guardando...';
+            lucide.createIcons();
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'confirm', numero: numero, nombre: nombre }),
+                    redirect: 'follow'
+                });
+                
+                const result = await processGoogleResponse(response);
+                if (result.success) {
+                    // Actualizar estado local
+                    players = players.map(p => 
+                        (p.numero.toString() === numero.toString() && p.nombre === nombre) 
+                            ? { ...p, confirmado: true } 
+                            : p
+                    );
+                    renderApp(); // Volver a dibujar
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Error al confirmar: ' + err.message);
+                // Restaurar botón si falla
+                btnElement.disabled = false;
+                renderApp();
+            }
+        }
+
+        // Añadir nuevo jugador (escribir en base)
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newNumber = document.getElementById('new-number').value;
+            const newName = document.getElementById('new-name').value;
+
+            // Validar si existe
+            if (players.some(p => p.numero.toString() === newNumber.toString())) {
+                showError(`El número ${newNumber} ya está en uso.`);
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('submit-text');
+            const btnSpinner = document.getElementById('submit-spinner');
+
+            // Estado visual form
+            btn.disabled = true;
+            btnText.textContent = 'Guardando...';
+            btnSpinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'add', numero: newNumber, nombre: newName }),
+                    redirect: 'follow'
+                });
+                
+                const result = await processGoogleResponse(response);
+                if (result.success) {
+                    document.getElementById('new-number').value = '';
+                    document.getElementById('new-name').value = '';
+                    await fetchData(); // Recargar toda la lista
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Error al agregar: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Agregar a la lista';
+                btnSpinner.classList.add('hidden');
+            }
+        });
+
+        // Estado visual global de recarga
+        function setLoading(isLoading) {
+            const refreshIcon = document.getElementById('refresh-icon');
+            const refreshBtn = document.getElementById('refresh-btn');
+            
+            if (isLoading) {
+                refreshIcon.classList.add('spinner', 'text-gray-800');
+                refreshBtn.disabled = true;
+                
+                if (players.length === 0) {
+                    elLoading.classList.remove('hidden');
+                    elList.classList.add('hidden');
+                    elEmpty.classList.add('hidden');
+                }
+            } else {
+                refreshIcon.classList.remove('spinner', 'text-gray-800');
+                refreshBtn.disabled = false;
+                elLoading.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
