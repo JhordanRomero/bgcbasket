@@ -28,9 +28,9 @@
         <div class="max-w-4xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="flex flex-col gap-2">
-                    <img src="https://i.imgur.com/m5xFiWX.png" alt="BGC Logo" class="h-14 w-auto object-contain self-start">
+                    <img src="https://i.imgur.com/qmyXSwI.png" alt="BGC Logo" class="w-28 h-auto object-contain self-start invert">
                     <div>
-                        <p class="text-gray-800 text-xs font-bold tracking-[0.25em] mb-0.5">BASKETBALL</p>
+                        <p class="text-gray-800 text-xs font-bold tracking-[0.25em] mb-0.5 mt-1">BASKETBALL</p>
                         <p class="text-gray-500 text-sm">Gestión de Camisetas Oficiales</p>
                     </div>
                 </div>
@@ -164,8 +164,8 @@
         // INICIALIZACIÓN
         lucide.createIcons();
         
-        // URL de tu base de datos proporcionada
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxmS66GCT3QgEUeRtVaWiRnoco1I3605D23jo-PBQKGZTXab7Vi5AUl5yFnvaLTs9Ba/exec';
+        // NUEVA URL de tu base de datos proporcionada
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxzU79SFavHPSJAYRgc3E8shQZeN8e1jWoyxidWIZaJqiaGOy5EpxFr0BikZcN1GlTg/exec';
         
         let players = [];
 
@@ -186,9 +186,13 @@
         function showError(msg) {
             elErrorMessage.innerHTML = msg;
             elErrorAlert.classList.remove('hidden');
-            setTimeout(() => {
-                elErrorAlert.classList.add('hidden');
-            }, 8000); // Mostrar por 8 segundos
+            
+            // Solo ocultar automáticamente si no es un error crítico
+            if (!msg.includes('ERROR CRÍTICO')) {
+                setTimeout(() => {
+                    elErrorAlert.classList.add('hidden');
+                }, 8000); // Mostrar por 8 segundos
+            }
         }
 
         // Helper para procesar respuesta de Google y capturar errores de permisos
@@ -199,7 +203,7 @@
             } catch (e) {
                 console.error("Respuesta cruda del servidor:", text);
                 if (text.toLowerCase().includes("<!doctype html>")) {
-                    throw new Error("Error de permisos. Revisa en Google Apps Script que <b>'Quién tiene acceso'</b> esté en <b>'Cualquier persona'</b>. Google está pidiendo iniciar sesión.");
+                    throw new Error("<b>🚨 ERROR CRÍTICO DE PERMISOS 🚨</b><br><br>Google está pidiendo iniciar sesión. Debes ir a Apps Script > Gestionar implementaciones > Editar > Nueva versión > Quién tiene acceso: <b>Cualquier persona</b>.");
                 }
                 throw new Error("Respuesta inválida del servidor: " + text.substring(0, 50));
             }
@@ -209,10 +213,10 @@
         async function fetchData() {
             setLoading(true);
             try {
-                // Se agrega redirect: follow por si Google hace un 302 redirect
                 const response = await fetch(API_URL, { 
                     method: 'GET',
-                    redirect: 'follow' 
+                    mode: 'cors',
+                    redirect: 'follow'
                 });
                 
                 const data = await processGoogleResponse(response);
@@ -224,7 +228,11 @@
                 renderApp();
             } catch (err) {
                 console.error(err);
-                showError('<strong>Error de conexión:</strong> ' + err.message);
+                let errorMsg = err.message;
+                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+                    errorMsg = '<b>🚨 ERROR CRÍTICO DE PERMISOS 🚨</b><br><br>Google bloqueó la conexión. Para solucionarlo:<br>1. Ve a Apps Script > <b>Implementar > Gestionar implementaciones</b>.<br>2. Clic en <b>Editar (Lápiz)</b>.<br>3. En Versión, elige <b>Nueva versión</b>.<br>4. En "Quién tiene acceso", elige exactamente <b>Cualquier persona</b>.<br>5. Clic en <b>Implementar</b>.';
+                }
+                showError(errorMsg);
                 elLoading.classList.add('hidden');
             } finally {
                 setLoading(false);
@@ -269,19 +277,21 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="action-container"></div>
+                        <div class="action-container flex items-center gap-2"></div>
                     `;
 
-                    // Botón o Etiqueta de Confirmación
+                    // Contenedor de acciones (Confirmar + Eliminar)
                     const actionContainer = li.querySelector('.action-container');
                     
+                    // 1. Botón/Etiqueta de Confirmación
                     if (isConfirmed) {
-                        actionContainer.innerHTML = `
-                            <div class="flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200">
-                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                                <span>Listo</span>
-                            </div>
+                        const label = document.createElement('div');
+                        label.className = "flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200";
+                        label.innerHTML = `
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <span>Listo</span>
                         `;
+                        actionContainer.appendChild(label);
                     } else {
                         const btn = document.createElement('button');
                         btn.className = "flex items-center gap-2 bg-white border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 text-gray-600 px-4 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50 confirm-btn";
@@ -293,12 +303,54 @@
                         actionContainer.appendChild(btn);
                     }
 
+                    // 2. Botón de Eliminar
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = "text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors ml-1";
+                    deleteBtn.title = "Eliminar jugador";
+                    deleteBtn.innerHTML = `<i data-lucide="trash-2" class="w-5 h-5"></i>`;
+                    deleteBtn.onclick = () => handleDelete(player.numero, player.nombre);
+                    actionContainer.appendChild(deleteBtn);
+
                     elList.appendChild(li);
                 });
             }
             
             // Re-renderizar iconos de Lucide insertados dinámicamente
             lucide.createIcons();
+        }
+
+        // Eliminar jugador
+        async function handleDelete(numero, nombre) {
+            const isConfirmed = confirm(`¿Estás seguro que deseas eliminar a ${nombre} (Camiseta #${numero}) de la lista?`);
+            if (!isConfirmed) return;
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'delete', numero: numero, nombre: nombre })
+                });
+                
+                const result = await processGoogleResponse(response);
+                if (result.success) {
+                    // Remover del estado local y re-dibujar
+                    players = players.filter(p => !(p.numero.toString() === numero.toString() && p.nombre === nombre));
+                    renderApp();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                let errorMsg = err.message;
+                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
+                }
+                showError('Error al eliminar: ' + errorMsg);
+            } finally {
+                setLoading(false);
+            }
         }
 
         // Confirmar jugador (escribir en base)
@@ -314,8 +366,7 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'confirm', numero: numero, nombre: nombre }),
-                    redirect: 'follow'
+                    body: JSON.stringify({ action: 'confirm', numero: numero, nombre: nombre })
                 });
                 
                 const result = await processGoogleResponse(response);
@@ -332,7 +383,11 @@
                 }
             } catch (err) {
                 console.error(err);
-                showError('Error al confirmar: ' + err.message);
+                let errorMsg = err.message;
+                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
+                }
+                showError('Error al confirmar: ' + errorMsg);
                 // Restaurar botón si falla
                 btnElement.disabled = false;
                 renderApp();
@@ -364,8 +419,7 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'add', numero: newNumber, nombre: newName }),
-                    redirect: 'follow'
+                    body: JSON.stringify({ action: 'add', numero: newNumber, nombre: newName })
                 });
                 
                 const result = await processGoogleResponse(response);
@@ -378,7 +432,11 @@
                 }
             } catch (err) {
                 console.error(err);
-                showError('Error al agregar: ' + err.message);
+                let errorMsg = err.message;
+                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
+                }
+                showError('Error al agregar: ' + errorMsg);
             } finally {
                 btn.disabled = false;
                 btnText.textContent = 'Agregar a la lista';
