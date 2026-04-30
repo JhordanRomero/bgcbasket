@@ -9,36 +9,40 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Animación de carga para el spinner */
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        /* Ocultar elementos */
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
+        
+        /* Ajuste para que los botones de acción no rompan el layout en móviles muy pequeños */
+        @media (max-width: 400px) {
+            .action-buttons { flex-wrap: wrap; justify-content: flex-end; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-800 font-sans pb-12">
 
     <!-- Header -->
-    <header class="bg-white text-gray-900 py-6 shadow-sm border-b border-gray-200">
+    <header class="bg-white text-gray-900 py-5 shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <div class="flex flex-col gap-2">
-                    <img src="https://i.imgur.com/qmyXSwI.png" alt="BGC Logo" class="w-28 h-auto object-contain self-start invert">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                <div class="flex items-center gap-3">
+                    <img src="https://i.imgur.com/qmyXSwI.png" alt="BGC Logo" class="w-20 sm:w-24 h-auto object-contain shrink-0 invert">
                     <div>
-                        <p class="text-gray-800 text-xs font-bold tracking-[0.25em] mb-0.5 mt-1">BASKETBALL</p>
-                        <p class="text-gray-500 text-sm">Gestión de Camisetas Oficiales</p>
+                        <p class="text-gray-800 text-[10px] sm:text-xs font-bold tracking-[0.25em] mb-0.5 mt-1">BASKETBALL</p>
+                        <p class="text-gray-500 text-xs sm:text-sm">Gestión de Camisetas Oficiales</p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-lg font-bold text-black">Valor: $24.990</p>
-                    <div class="mt-2 flex items-center justify-end gap-1.5 text-sm text-gray-500">
-                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span>Sistema Online</span>
+                <div class="w-full sm:w-auto flex justify-between sm:flex-col items-center sm:items-end border-t border-gray-100 sm:border-0 pt-3 sm:pt-0 mt-1 sm:mt-0">
+                    <p class="text-base sm:text-lg font-bold text-black">Valor: $24.990</p>
+                    <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-500">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <span class="hidden sm:inline">Sistema Online</span>
+                            <span class="sm:hidden">Online</span>
+                        </div>
+                        <button id="toggle-config-btn" class="text-gray-400 hover:text-gray-800 transition-colors bg-gray-100 p-1.5 rounded-md" title="Configurar conexión">
+                            <i data-lucide="settings" class="w-4 h-4"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -47,111 +51,140 @@
 
     <main class="max-w-4xl mx-auto px-4 mt-6">
         
-        <!-- Alerta de Error -->
-        <div id="error-alert" class="hidden bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 mb-6 border border-red-200">
-            <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
-            <p id="error-message" class="text-sm"></p>
+        <!-- Panel de Configuración de Link -->
+        <div id="config-panel" class="hidden bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6 transition-all">
+            <h2 class="text-base font-bold flex items-center gap-2 mb-3 text-slate-800">
+                <i data-lucide="link" class="text-blue-500 w-4 h-4"></i>
+                Conectar Base de Datos (Google Apps Script)
+            </h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input 
+                    type="url"
+                    id="api-url-input"
+                    placeholder="Pega aquí el link de tu Web App (https://script.google.com/...)"
+                    class="flex-1 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
+                >
+                <button 
+                    id="save-url-btn"
+                    class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                >
+                    Guardar
+                </button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Alerta de Error -->
+        <div id="error-alert" class="hidden bg-red-50 text-red-700 p-3 rounded-lg flex items-start gap-3 mb-6 border border-red-200">
+            <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+            <p id="error-message" class="text-sm leading-relaxed"></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             
             <!-- Columna Izquierda: Estadísticas y Formulario -->
-            <div class="md:col-span-1 space-y-6">
+            <div class="md:col-span-1 space-y-5 sm:space-y-6">
                 
                 <!-- Stats -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                    <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-3">Resumen</h3>
-                    <div class="space-y-4">
+                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Resumen</h3>
+                    <div class="space-y-3 text-sm sm:text-base">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Total Jugadores:</span>
-                            <span id="stat-total" class="font-bold text-lg">0</span>
+                            <span id="stat-total" class="font-bold">0</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Confirmados:</span>
-                            <span id="stat-confirmed" class="font-bold text-lg text-green-600">0</span>
+                            <span id="stat-confirmed" class="font-bold text-green-600">0</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Pendientes:</span>
-                            <span id="stat-pending" class="font-bold text-lg text-orange-500">0</span>
+                            <span id="stat-pending" class="font-bold text-orange-500">0</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Formulario -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-                        <i data-lucide="plus" class="text-black w-5 h-5"></i>
-                        Añadir Jugador
-                    </h3>
-                    <form id="add-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="hash" class="text-gray-400 w-4 h-4"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Cabecera colapsable en móvil -->
+                    <div id="toggle-form-btn" class="p-4 sm:p-5 flex justify-between items-center cursor-pointer sm:cursor-default bg-gray-50 sm:bg-white border-b sm:border-0 border-gray-200">
+                        <h3 class="text-base font-bold flex items-center gap-2 text-slate-800">
+                            <i data-lucide="user-plus" class="text-black w-4 h-4"></i>
+                            Añadir Jugador
+                        </h3>
+                        <i data-lucide="chevron-down" id="form-chevron" class="w-5 h-5 text-gray-500 sm:hidden transition-transform duration-300"></i>
+                    </div>
+                    
+                    <div id="add-form-container" class="hidden sm:block p-4 sm:p-5 sm:pt-0">
+                        <form id="add-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Número</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="hash" class="text-gray-400 w-4 h-4"></i>
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="new-number"
+                                        required
+                                        class="w-full pl-9 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
+                                        placeholder="Ej: 10"
+                                    >
                                 </div>
-                                <input 
-                                    type="number" 
-                                    id="new-number"
-                                    required
-                                    class="w-full pl-10 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
-                                    placeholder="Ej: 10"
-                                >
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="user" class="text-gray-400 w-4 h-4"></i>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nombre</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="user" class="text-gray-400 w-4 h-4"></i>
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        id="new-name"
+                                        required
+                                        class="w-full pl-9 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
+                                        placeholder="Ej: Messi"
+                                    >
                                 </div>
-                                <input 
-                                    type="text" 
-                                    id="new-name"
-                                    required
-                                    class="w-full pl-10 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
-                                    placeholder="Ej: Messi"
-                                >
                             </div>
-                        </div>
-                        <button 
-                            type="submit"
-                            id="submit-btn"
-                            class="w-full bg-slate-900 hover:bg-slate-800 text-white p-3 rounded-lg font-medium transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
-                        >
-                            <span id="submit-text">Agregar a la lista</span>
-                            <i data-lucide="refresh-cw" id="submit-spinner" class="w-4 h-4 hidden spinner"></i>
-                        </button>
-                    </form>
+                            <button 
+                                type="submit"
+                                id="submit-btn"
+                                class="w-full bg-slate-900 hover:bg-slate-800 text-white p-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+                            >
+                                <span id="submit-text">Añadir a la lista</span>
+                                <i data-lucide="refresh-cw" id="submit-spinner" class="w-4 h-4 hidden spinner"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <!-- Columna Derecha: Lista de Jugadores -->
             <div class="md:col-span-2">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h2 class="font-bold text-lg text-slate-800">Lista de Pedidos</h2>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full max-h-[800px]">
+                    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+                        <h2 class="font-bold text-base text-slate-800">Lista de Equipo</h2>
                         <button 
                             onclick="fetchData()"
                             id="refresh-btn"
-                            class="text-gray-500 hover:text-black transition-colors p-2 disabled:opacity-50"
+                            class="text-gray-500 hover:text-black transition-colors p-1.5 rounded-md disabled:opacity-50"
                             title="Actualizar lista"
                         >
-                            <i data-lucide="refresh-cw" id="refresh-icon" class="w-5 h-5"></i>
+                            <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
                         </button>
                     </div>
                     
-                    <div id="loading-state" class="p-12 text-center text-gray-500 flex flex-col items-center">
-                        <i data-lucide="refresh-cw" class="w-10 h-10 mb-4 text-gray-800 spinner"></i>
-                        <p>Cargando datos de la base...</p>
+                    <div id="loading-state" class="p-10 text-center text-gray-500 flex flex-col items-center">
+                        <i data-lucide="refresh-cw" class="w-8 h-8 mb-3 text-gray-400 spinner"></i>
+                        <p class="text-sm">Cargando base de datos...</p>
                     </div>
 
-                    <div id="empty-state" class="p-12 text-center text-gray-500 hidden">
-                        <p>No hay jugadores en la lista aún.</p>
+                    <div id="empty-state" class="p-10 text-center text-gray-500 hidden">
+                        <p class="text-sm">No hay jugadores en la lista aún.</p>
                     </div>
 
-                    <ul id="players-list" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto hidden">
-                        <!-- Los jugadores se renderizarán aquí mediante JavaScript -->
+                    <ul id="players-list" class="divide-y divide-gray-100 overflow-y-auto hidden flex-1">
+                        <!-- Renderizado por JS -->
                     </ul>
                 </div>
             </div>
@@ -159,96 +192,147 @@
         </div>
     </main>
 
+    <!-- Modal para Editar Jugador -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 px-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                    <i data-lucide="pencil" class="w-4 h-4 text-blue-500"></i>
+                    Editar Jugador
+                </h3>
+                <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="edit-form" class="p-5 space-y-4">
+                <input type="hidden" id="edit-old-number">
+                <input type="hidden" id="edit-old-name">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nuevo Número</label>
+                    <input 
+                        type="number" 
+                        id="edit-new-number"
+                        required
+                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nuevo Nombre</label>
+                    <input 
+                        type="text" 
+                        id="edit-new-name"
+                        required
+                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                </div>
+                <div class="flex justify-end gap-3 mt-6 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="edit-submit-btn" class="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
+                        <span id="edit-submit-text">Guardar</span>
+                        <i data-lucide="refresh-cw" id="edit-submit-spinner" class="w-4 h-4 hidden spinner"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Lógica de la Aplicación -->
     <script>
-        // INICIALIZACIÓN
         lucide.createIcons();
         
-        // NUEVA URL de tu base de datos proporcionada
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxzU79SFavHPSJAYRgc3E8shQZeN8e1jWoyxidWIZaJqiaGOy5EpxFr0BikZcN1GlTg/exec';
-        
+        const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbxzU79SFavHPSJAYRgc3E8shQZeN8e1jWoyxidWIZaJqiaGOy5EpxFr0BikZcN1GlTg/exec';
+        let API_URL = localStorage.getItem('bgc_api_url') || DEFAULT_URL;
         let players = [];
 
-        // Elementos del DOM
+        // DOM Elements
         const elList = document.getElementById('players-list');
         const elLoading = document.getElementById('loading-state');
         const elEmpty = document.getElementById('empty-state');
         const elErrorAlert = document.getElementById('error-alert');
         const elErrorMessage = document.getElementById('error-message');
         const form = document.getElementById('add-form');
+        const editForm = document.getElementById('edit-form');
+        const editModal = document.getElementById('edit-modal');
 
-        // Cargar datos al iniciar
+        // UX: Colapsar formulario en móvil
+        document.getElementById('toggle-form-btn').onclick = () => {
+            if (window.innerWidth < 640) { // sm breakpoint
+                const formContainer = document.getElementById('add-form-container');
+                const chevron = document.getElementById('form-chevron');
+                formContainer.classList.toggle('hidden');
+                chevron.classList.toggle('rotate-180');
+            }
+        };
+
+        // Panel de configuración
+        document.getElementById('toggle-config-btn').onclick = () => {
+            document.getElementById('config-panel').classList.toggle('hidden');
+            document.getElementById('api-url-input').value = API_URL;
+        };
+
+        document.getElementById('save-url-btn').onclick = () => {
+            const newUrl = document.getElementById('api-url-input').value.trim();
+            if (newUrl) {
+                API_URL = newUrl;
+                localStorage.setItem('bgc_api_url', newUrl);
+                document.getElementById('config-panel').classList.add('hidden');
+                fetchData(); 
+            }
+        };
+
         window.onload = () => {
+            if (!API_URL) document.getElementById('config-panel').classList.remove('hidden');
             fetchData();
         };
 
-        // Función para mostrar error
         function showError(msg) {
             elErrorMessage.innerHTML = msg;
             elErrorAlert.classList.remove('hidden');
-            
-            // Solo ocultar automáticamente si no es un error crítico
             if (!msg.includes('ERROR CRÍTICO')) {
-                setTimeout(() => {
-                    elErrorAlert.classList.add('hidden');
-                }, 8000); // Mostrar por 8 segundos
+                setTimeout(() => { elErrorAlert.classList.add('hidden'); }, 12000);
             }
         }
 
-        // Helper para procesar respuesta de Google y capturar errores de permisos
         async function processGoogleResponse(response) {
             const text = await response.text();
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error("Respuesta cruda del servidor:", text);
-                if (text.toLowerCase().includes("<!doctype html>")) {
-                    throw new Error("<b>🚨 ERROR CRÍTICO DE PERMISOS 🚨</b><br><br>Google está pidiendo iniciar sesión. Debes ir a Apps Script > Gestionar implementaciones > Editar > Nueva versión > Quién tiene acceso: <b>Cualquier persona</b>.");
+            try { return JSON.parse(text); } 
+            catch (e) {
+                if (text.toLowerCase().includes("<!doctype html>") || text.toLowerCase().includes("<html")) {
+                    throw new Error("<b>🚨 ERROR DE PERMISOS 🚨</b><br>Google bloqueó la solicitud. Revisa en tu Script que el acceso sea <b>'Cualquier persona'</b>.");
                 }
-                throw new Error("Respuesta inválida del servidor: " + text.substring(0, 50));
+                throw new Error("Respuesta inválida del servidor.");
             }
         }
 
-        // Leer datos de la base
         async function fetchData() {
+            if (!API_URL) return;
             setLoading(true);
             try {
-                const response = await fetch(API_URL, { 
-                    method: 'GET',
-                    mode: 'cors',
-                    redirect: 'follow'
-                });
-                
+                const response = await fetch(API_URL);
                 const data = await processGoogleResponse(response);
-                
                 if (data.error) throw new Error(data.error);
                 
-                // Ordenar por número
                 players = data.sort((a, b) => Number(a.numero) - Number(b.numero));
                 renderApp();
             } catch (err) {
-                console.error(err);
-                let errorMsg = err.message;
-                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                    errorMsg = '<b>🚨 ERROR CRÍTICO DE PERMISOS 🚨</b><br><br>Google bloqueó la conexión. Para solucionarlo:<br>1. Ve a Apps Script > <b>Implementar > Gestionar implementaciones</b>.<br>2. Clic en <b>Editar (Lápiz)</b>.<br>3. En Versión, elige <b>Nueva versión</b>.<br>4. En "Quién tiene acceso", elige exactamente <b>Cualquier persona</b>.<br>5. Clic en <b>Implementar</b>.';
-                }
-                showError(errorMsg);
+                showError(err.message.includes('Failed to fetch') 
+                    ? "<b>🚨 ERROR (CORS) 🚨</b><br>Revisa los permisos de 'Cualquier persona' en la implementación de Apps Script." 
+                    : err.message);
                 elLoading.classList.add('hidden');
             } finally {
                 setLoading(false);
             }
         }
 
-        // Actualizar UI
         function renderApp() {
-            // Actualizar Estadísticas
             const confirmedCount = players.filter(p => p.confirmado).length;
-
             document.getElementById('stat-total').textContent = players.length;
             document.getElementById('stat-confirmed').textContent = confirmedCount;
             document.getElementById('stat-pending').textContent = players.length - confirmedCount;
 
-            // Renderizar Lista
             elList.innerHTML = '';
             
             if (players.length === 0) {
@@ -258,149 +342,145 @@
                 elEmpty.classList.add('hidden');
                 elList.classList.remove('hidden');
 
-                players.forEach((player, index) => {
+                players.forEach((player) => {
                     const li = document.createElement('li');
-                    li.className = "p-4 hover:bg-gray-50 flex items-center justify-between transition-colors";
-                    
+                    li.className = "p-3 hover:bg-gray-50 flex items-center justify-between gap-3 transition-colors group";
                     const isConfirmed = player.confirmado === true || player.confirmado === "true" || player.confirmado === "TRUE";
 
-                    // Contenido del jugador
+                    // UX Mejorada: Lista compacta
                     li.innerHTML = `
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shrink-0">
-                                <span class="font-black text-slate-700 text-lg">${player.numero}</span>
+                        <div class="flex items-center gap-3 w-full min-w-0">
+                            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200 shrink-0">
+                                <span class="font-black text-slate-700 text-sm">${player.numero}</span>
                             </div>
-                            <div>
-                                <p class="font-bold text-gray-800 text-lg capitalize">${player.nombre}</p>
-                                <p class="text-sm font-medium ${isConfirmed ? 'text-green-600' : 'text-orange-500'}">
-                                    ${isConfirmed ? '✓ Confirmado' : 'Pendiente'}
+                            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                <p class="font-bold text-gray-800 text-sm capitalize truncate leading-tight">${player.nombre}</p>
+                                <p class="text-[11px] font-semibold mt-0.5 ${isConfirmed ? 'text-green-600' : 'text-orange-500'}">
+                                    ${isConfirmed ? '✓ CONFIRMADO' : 'PENDIENTE'}
                                 </p>
                             </div>
                         </div>
-                        <div class="action-container flex items-center gap-2"></div>
+                        <div class="action-buttons flex items-center gap-1 shrink-0"></div>
                     `;
 
-                    // Contenedor de acciones (Confirmar + Eliminar)
-                    const actionContainer = li.querySelector('.action-container');
+                    const actionContainer = li.querySelector('.action-buttons');
                     
-                    // 1. Botón/Etiqueta de Confirmación
+                    // Botón Confirmar o Desconfirmar
                     if (isConfirmed) {
-                        const label = document.createElement('div');
-                        label.className = "flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200";
-                        label.innerHTML = `
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                            <span>Listo</span>
+                        const unconfirmBtn = document.createElement('button');
+                        // Usamos hover para cambiar de "Listo" a "Desmarcar"
+                        unconfirmBtn.className = "group/btn flex items-center gap-1.5 text-green-600 bg-green-50 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200 transition-colors";
+                        unconfirmBtn.title = "Quitar confirmación";
+                        unconfirmBtn.innerHTML = `
+                            <i data-lucide="check-circle-2" class="w-4 h-4 group-hover/btn:hidden"></i>
+                            <i data-lucide="x-circle" class="w-4 h-4 hidden group-hover/btn:block"></i>
+                            <span class="group-hover/btn:hidden">Listo</span>
+                            <span class="hidden group-hover/btn:block">Desmarcar</span>
                         `;
-                        actionContainer.appendChild(label);
+                        unconfirmBtn.onclick = () => handleUnconfirm(player.numero, player.nombre, unconfirmBtn);
+                        actionContainer.appendChild(unconfirmBtn);
                     } else {
-                        const btn = document.createElement('button');
-                        btn.className = "flex items-center gap-2 bg-white border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 text-gray-600 px-4 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50 confirm-btn";
-                        btn.innerHTML = `
-                            <i data-lucide="circle" class="w-4 h-4 btn-icon"></i>
-                            <span class="btn-text">Confirmar</span>
-                        `;
-                        btn.onclick = () => handleConfirm(player.numero, player.nombre, btn);
-                        actionContainer.appendChild(btn);
+                        const confirmBtn = document.createElement('button');
+                        confirmBtn.className = "p-2 bg-white border border-gray-200 hover:border-green-500 hover:text-green-600 hover:bg-green-50 text-gray-400 rounded-lg transition-colors";
+                        confirmBtn.title = "Confirmar jugador";
+                        confirmBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 btn-icon"></i>`;
+                        confirmBtn.onclick = () => handleConfirm(player.numero, player.nombre, confirmBtn);
+                        actionContainer.appendChild(confirmBtn);
                     }
 
-                    // 2. Botón de Eliminar
+                    // Botón Editar
+                    const editBtn = document.createElement('button');
+                    editBtn.className = "p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors";
+                    editBtn.title = "Editar jugador";
+                    editBtn.innerHTML = `<i data-lucide="pencil" class="w-4 h-4"></i>`;
+                    editBtn.onclick = () => openEditModal(player.numero, player.nombre);
+                    actionContainer.appendChild(editBtn);
+
+                    // Botón Eliminar
                     const deleteBtn = document.createElement('button');
-                    deleteBtn.className = "text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors ml-1";
+                    deleteBtn.className = "p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors";
                     deleteBtn.title = "Eliminar jugador";
-                    deleteBtn.innerHTML = `<i data-lucide="trash-2" class="w-5 h-5"></i>`;
+                    deleteBtn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i>`;
                     deleteBtn.onclick = () => handleDelete(player.numero, player.nombre);
                     actionContainer.appendChild(deleteBtn);
 
                     elList.appendChild(li);
                 });
             }
-            
-            // Re-renderizar iconos de Lucide insertados dinámicamente
             lucide.createIcons();
         }
 
-        // Eliminar jugador
-        async function handleDelete(numero, nombre) {
-            const isConfirmed = confirm(`¿Estás seguro que deseas eliminar a ${nombre} (Camiseta #${numero}) de la lista?`);
-            if (!isConfirmed) return;
-
-            setLoading(true);
-
+        // --- FUNCIONES DE ACCIÓN ---
+        async function fetchAction(actionObj, successCallback, btnElement = null) {
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'delete', numero: numero, nombre: nombre })
+                    body: JSON.stringify(actionObj),
+                    redirect: 'follow'
                 });
                 
                 const result = await processGoogleResponse(response);
                 if (result.success) {
-                    // Remover del estado local y re-dibujar
-                    players = players.filter(p => !(p.numero.toString() === numero.toString() && p.nombre === nombre));
-                    renderApp();
+                    successCallback();
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || "Error desconocido en el servidor");
                 }
             } catch (err) {
                 console.error(err);
                 let errorMsg = err.message;
+                
                 if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
+                    errorMsg = `<b>🚨 ERROR AL EJECUTAR LA ACCIÓN 🚨</b><br><br>Google bloqueó la función. Esto ocurre casi siempre porque agregaste nuevo código al Google Script, pero <b>no creaste una Nueva Versión</b>.<br><br><b>¿Cómo arreglarlo?</b><br>1. Ve a tu Google Apps Script.<br>2. Clic en <b>Implementar > Gestionar implementaciones</b>.<br>3. Clic en el icono del Lápiz (Editar).<br>4. En Versión, elige obligatoriamente <b>NUEVA VERSIÓN</b>.<br>5. Clic en Implementar.`;
                 }
-                showError('Error al eliminar: ' + errorMsg);
-            } finally {
-                setLoading(false);
+                
+                showError(errorMsg);
+                // Restauramos la UI para que los botones no se queden cargando infinitamente
+                renderApp(); 
             }
         }
 
-        // Confirmar jugador (escribir en base)
-        async function handleConfirm(numero, nombre, btnElement) {
-            // Estado visual de carga en el botón
+        // CONFIRMAR
+        function handleConfirm(numero, nombre, btnElement) {
             btnElement.disabled = true;
-            btnElement.querySelector('.btn-icon').setAttribute('data-lucide', 'refresh-cw');
-            btnElement.querySelector('.btn-icon').classList.add('spinner');
-            btnElement.querySelector('.btn-text').textContent = 'Guardando...';
+            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner"></i>`;
             lucide.createIcons();
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'confirm', numero: numero, nombre: nombre })
-                });
-                
-                const result = await processGoogleResponse(response);
-                if (result.success) {
-                    // Actualizar estado local
-                    players = players.map(p => 
-                        (p.numero.toString() === numero.toString() && p.nombre === nombre) 
-                            ? { ...p, confirmado: true } 
-                            : p
-                    );
-                    renderApp(); // Volver a dibujar
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (err) {
-                console.error(err);
-                let errorMsg = err.message;
-                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
-                }
-                showError('Error al confirmar: ' + errorMsg);
-                // Restaurar botón si falla
-                btnElement.disabled = false;
+            fetchAction({ action: 'confirm', numero, nombre }, () => {
+                players = players.map(p => (p.numero.toString() === numero.toString() && p.nombre === nombre) ? { ...p, confirmado: true } : p);
                 renderApp();
-            }
+            }, btnElement);
         }
 
-        // Añadir nuevo jugador (escribir en base)
-        form.addEventListener('submit', async (e) => {
+        // QUITAR CONFIRMACIÓN
+        function handleUnconfirm(numero, nombre, btnElement) {
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner"></i>`;
+            lucide.createIcons();
+
+            fetchAction({ action: 'unconfirm', numero, nombre }, () => {
+                players = players.map(p => (p.numero.toString() === numero.toString() && p.nombre === nombre) ? { ...p, confirmado: false } : p);
+                renderApp();
+            }, btnElement);
+        }
+
+        // ELIMINAR
+        function handleDelete(numero, nombre) {
+            if (!confirm(`¿Eliminar a ${nombre} (#${numero})?`)) return;
+            setLoading(true);
+            fetchAction({ action: 'delete', numero, nombre }, () => {
+                players = players.filter(p => !(p.numero.toString() === numero.toString() && p.nombre === nombre));
+                renderApp();
+                setLoading(false);
+            });
+        }
+
+        // AÑADIR
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             const newNumber = document.getElementById('new-number').value;
             const newName = document.getElementById('new-name').value;
 
-            // Validar si existe
             if (players.some(p => p.numero.toString() === newNumber.toString())) {
                 showError(`El número ${newNumber} ya está en uso.`);
                 return;
@@ -410,56 +490,86 @@
             const btnText = document.getElementById('submit-text');
             const btnSpinner = document.getElementById('submit-spinner');
 
-            // Estado visual form
             btn.disabled = true;
             btnText.textContent = 'Guardando...';
             btnSpinner.classList.remove('hidden');
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'add', numero: newNumber, nombre: newName })
-                });
-                
-                const result = await processGoogleResponse(response);
-                if (result.success) {
-                    document.getElementById('new-number').value = '';
-                    document.getElementById('new-name').value = '';
-                    await fetchData(); // Recargar toda la lista
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (err) {
-                console.error(err);
-                let errorMsg = err.message;
-                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                    errorMsg = 'Conexión bloqueada. Revisa los permisos en Google Apps Script ("Cualquier persona").';
-                }
-                showError('Error al agregar: ' + errorMsg);
-            } finally {
+            fetchAction({ action: 'add', numero: newNumber, nombre: newName }, async () => {
+                document.getElementById('new-number').value = '';
+                document.getElementById('new-name').value = '';
                 btn.disabled = false;
-                btnText.textContent = 'Agregar a la lista';
+                btnText.textContent = 'Añadir a la lista';
                 btnSpinner.classList.add('hidden');
-            }
+                
+                // Si estamos en móvil, cerramos el menú tras agregar
+                if (window.innerWidth < 640) {
+                    document.getElementById('add-form-container').classList.add('hidden');
+                    document.getElementById('form-chevron').classList.remove('rotate-180');
+                }
+
+                await fetchData();
+            }, btn);
         });
 
-        // Estado visual global de recarga
+        // --- LÓGICA DE EDICIÓN (MODAL) ---
+        function openEditModal(numero, nombre) {
+            document.getElementById('edit-old-number').value = numero;
+            document.getElementById('edit-old-name').value = nombre;
+            document.getElementById('edit-new-number').value = numero;
+            document.getElementById('edit-new-name').value = nombre;
+            
+            editModal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+        }
+
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const oldNumero = document.getElementById('edit-old-number').value;
+            const oldNombre = document.getElementById('edit-old-name').value;
+            const newNumero = document.getElementById('edit-new-number').value;
+            const newNombre = document.getElementById('edit-new-name').value;
+
+            // Validar que si cambia de número, el nuevo no exista en otro jugador
+            if (oldNumero !== newNumero && players.some(p => p.numero.toString() === newNumero.toString())) {
+                alert(`El número ${newNumero} ya está ocupado.`);
+                return;
+            }
+
+            const btn = document.getElementById('edit-submit-btn');
+            const btnText = document.getElementById('edit-submit-text');
+            const btnSpinner = document.getElementById('edit-submit-spinner');
+
+            btn.disabled = true;
+            btnText.textContent = 'Guardando...';
+            btnSpinner.classList.remove('hidden');
+
+            fetchAction({ action: 'edit', oldNumero, oldNombre, newNumero, newNombre }, async () => {
+                closeEditModal();
+                btn.disabled = false;
+                btnText.textContent = 'Guardar';
+                btnSpinner.classList.add('hidden');
+                await fetchData();
+            }, btn);
+        });
+
+        // --- ESTADO DE CARGA GLOBAL ---
         function setLoading(isLoading) {
             const refreshIcon = document.getElementById('refresh-icon');
             const refreshBtn = document.getElementById('refresh-btn');
             
             if (isLoading) {
-                refreshIcon.classList.add('spinner', 'text-gray-800');
+                refreshIcon.classList.add('spinner');
                 refreshBtn.disabled = true;
-                
                 if (players.length === 0) {
                     elLoading.classList.remove('hidden');
                     elList.classList.add('hidden');
                     elEmpty.classList.add('hidden');
                 }
             } else {
-                refreshIcon.classList.remove('spinner', 'text-gray-800');
+                refreshIcon.classList.remove('spinner');
                 refreshBtn.disabled = false;
                 elLoading.classList.add('hidden');
             }
