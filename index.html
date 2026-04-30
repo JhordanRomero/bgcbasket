@@ -368,14 +368,18 @@
                     // Botón Confirmar o Desconfirmar
                     if (isConfirmed) {
                         const unconfirmBtn = document.createElement('button');
-                        // Usamos hover para cambiar de "Listo" a "Desmarcar"
-                        unconfirmBtn.className = "group/btn flex items-center gap-1.5 text-green-600 bg-green-50 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200 transition-colors";
+                        // Se soluciona el glitch fijando un ancho estable (min-w-[110px]) y usando pointer-events-none en los textos
+                        unconfirmBtn.className = "group/btn flex items-center justify-center text-green-600 bg-green-50 hover:bg-red-50 hover:text-red-600 hover:border-red-200 h-8 min-w-[110px] rounded-full text-sm font-bold border border-green-200 transition-colors cursor-pointer";
                         unconfirmBtn.title = "Quitar confirmación";
                         unconfirmBtn.innerHTML = `
-                            <i data-lucide="check-circle-2" class="w-4 h-4 group-hover/btn:hidden"></i>
-                            <i data-lucide="x-circle" class="w-4 h-4 hidden group-hover/btn:block"></i>
-                            <span class="group-hover/btn:hidden">Listo</span>
-                            <span class="hidden group-hover/btn:block">Desmarcar</span>
+                            <div class="flex items-center gap-1.5 group-hover/btn:hidden pointer-events-none">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                <span>Listo</span>
+                            </div>
+                            <div class="hidden items-center gap-1.5 group-hover/btn:flex pointer-events-none">
+                                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                                <span>Desmarcar</span>
+                            </div>
                         `;
                         unconfirmBtn.onclick = () => handleUnconfirm(player.numero, player.nombre, unconfirmBtn);
                         actionContainer.appendChild(unconfirmBtn);
@@ -443,7 +447,7 @@
         // CONFIRMAR
         function handleConfirm(numero, nombre, btnElement) {
             btnElement.disabled = true;
-            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner"></i>`;
+            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner pointer-events-none"></i>`;
             lucide.createIcons();
 
             fetchAction({ action: 'confirm', numero, nombre }, () => {
@@ -455,7 +459,7 @@
         // QUITAR CONFIRMACIÓN
         function handleUnconfirm(numero, nombre, btnElement) {
             btnElement.disabled = true;
-            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner"></i>`;
+            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner pointer-events-none"></i>`;
             lucide.createIcons();
 
             fetchAction({ action: 'unconfirm', numero, nombre }, () => {
