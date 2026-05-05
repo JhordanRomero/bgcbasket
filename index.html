@@ -411,11 +411,16 @@
         // =======================================================================
         function transformName(name) {
             if (!name) return '';
-            const n = name.toLowerCase().trim();
+            
+            // Eliminar tildes y acentos automáticamente (ej: Martín -> Martin)
+            let nameSinTildes = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            const n = nameSinTildes.toLowerCase().trim();
             if (n === 'aka') return 'AK';
             if (n.includes('novi')) return 'novi';
             if (n.includes('mike')) return 'mike';
-            return name.toUpperCase();
+            
+            return nameSinTildes.toUpperCase();
         }
 
         function updateJerseyDisplay(playerNum) {
