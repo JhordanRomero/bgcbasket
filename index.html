@@ -300,12 +300,10 @@
             setConnectionStatus('loading');
             try {
                 const response = await fetch(SCRIPT_URL);
-                // Si la URL es incorrecta o Apps Script da un error, no devolverá JSON
                 if (!response.ok) throw new Error("Network response was not ok");
                 
                 const data = await response.json();
                 
-                // Si hay datos en la hoja, los usamos. Si no, usamos la plantilla original.
                 if (data && Array.isArray(data) && data.length > 0) {
                     players = data;
                     setConnectionStatus('online');
@@ -318,7 +316,6 @@
             } catch (error) {
                 console.error("Error cargando datos desde Sheets:", error);
                 setConnectionStatus('error');
-                // Si falla la conexión, cargar los jugadores por defecto para no mostrar en blanco
                 players = [...INITIAL_PLAYERS];
                 renderPlayers();
                 updateJerseySelect();
@@ -330,11 +327,11 @@
 
         // 2. Función genérica para enviar acciones a Google Sheets
         async function runAction(actionName, payload) {
-            setConnectionStatus('loading'); // Mostrar que estamos guardando
+            setConnectionStatus('loading'); 
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    // Importante: Apps Script maneja mejor las redirecciones POST con text/plain
+                    redirect: 'follow', // OBLIGATORIO PARA GOOGLE APPS SCRIPT
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: actionName, ...payload })
                 });
@@ -342,11 +339,11 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    setConnectionStatus('online'); // Todo bien
+                    setConnectionStatus('online'); 
                 } else {
                     console.error("Error desde Apps Script:", result.error);
-                    setConnectionStatus('error'); // Falló en el servidor
-                    alert("Error al guardar online: " + (result.error || "Desconocido"));
+                    setConnectionStatus('error');
+                    alert("Error en el servidor: " + (result.error || "Desconocido"));
                 }
             } catch (error) {
                 console.error(`Error ejecutando acción [${actionName}]:`, error);
@@ -424,7 +421,7 @@
         }
 
         function updateJerseyDisplay(playerNum) {
-            const player = players.find(p => p.numero === playerNum);
+            const player = players.find(p => String(p.numero) === String(playerNum));
             const controls = document.getElementById('jersey-controls');
             const frontGroup = document.getElementById('front-text-group');
             const backGroup = document.getElementById('back-text-group');
@@ -441,7 +438,7 @@
             document.getElementById('preview-text-label').innerText = transformName(player.nombre);
 
             // FRONT TEXT
-            const is420 = player.numero === '420';
+            const is420 = String(player.numero) === '420';
             const fSize = is420 ? 300 : 390;
             const fLen = is420 ? 480 : '';
 
@@ -456,12 +453,16 @@
             const bLen = is420 ? 650 : '';
             const tName = transformName(player.nombre);
 
-            // Ajustar tamaño y compresión para nombres largos (ej. SEBASTIAN)
+            // Ajustes estrictos de tamaño para nombres en la espalda
             let nameFontSize = 200;
             let nameTextLength = '';
-            if (tName.length >= 8) {
-                nameFontSize = 170; // Letra un poco más pequeña
-                nameTextLength = 'textLength="900" lengthAdjust="spacingAndGlyphs"'; // Apretar el texto en un ancho máximo
+            
+            if (tName.length >= 9) { // Nombres muy largos (SEBASTIÁN = 9 letras)
+                nameFontSize = 130; 
+                nameTextLength = 'textLength="700" lengthAdjust="spacingAndGlyphs"'; 
+            } else if (tName.length >= 7) { // Nombres moderadamente largos
+                nameFontSize = 160; 
+                nameTextLength = 'textLength="800" lengthAdjust="spacingAndGlyphs"'; 
             }
 
             backGroup.innerHTML = `
@@ -504,7 +505,7 @@
             e.preventDefault();
             const n = document.getElementById('new-number').value;
             const m = document.getElementById('new-name').value;
-            if (players.some(p => p.numero.toString() === n.toString())) return alert('Número ocupado');
+            if (players.some(p => String(p.numero) === String(n))) return alert('Número ocupado');
             
             // Actualizar interfaz instantáneamente (Optimistic UI)
             players.push({ numero: n, nombre: m, confirmado: false });
@@ -519,7 +520,7 @@
         async function toggleConfirm(idx) {
             const p = players[idx];
             p.confirmado = !p.confirmado;
-            renderPlayers(); // UI al instante
+            renderPlayers(); 
             
             const action = p.confirmado ? 'confirm' : 'unconfirm';
             await runAction(action, { numero: p.numero, nombre: p.nombre });
