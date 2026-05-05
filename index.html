@@ -13,10 +13,11 @@
         /* CARGA NATIVA Y DIRECTA DE LA FUENTE DESDE TU GITHUB */
         @font-face {
             font-family: 'Basketball';
-            src: url('./Basketball.woff') format('woff');
+            src: url('https://jhordanromero.github.io/bgcbasket/Basketball.woff') format('woff'),
+                 url('Basketball.woff') format('woff'); /* Respaldo relativo */
             font-weight: normal;
             font-style: normal;
-            font-display: swap; /* Muestra una fuente genérica mientras descarga, y luego hace el cambiazo */
+            font-display: swap; 
         }
 
         :root {
@@ -36,10 +37,10 @@
             font-family: 'Space Grotesk', sans-serif;
         }
 
+        /* OJO: Se ha eliminado dominant-baseline: middle para arreglar el bug de iOS */
         .font-basketball {
-            font-family: 'Basketball', sans-serif;
+            font-family: 'Basketball', sans-serif !important;
             text-anchor: middle;
-            dominant-baseline: middle;
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -166,7 +167,6 @@
                                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Vista Previa Texto</p>
                                 <p id="preview-text-label" class="text-xl font-black text-gray-900 uppercase font-basketball">---</p>
                             </div>
-                            <!-- He removido los botones de guardar imagen ya que ahora se tomarán capturas -->
                         </div>
                     </div>
                 </div>
@@ -228,7 +228,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         // =======================================================================
         // LÓGICA DE BASE DE DATOS Y ESTADOS
@@ -263,11 +262,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('script-url-input').value = SCRIPT_URL;
+            loadPlayers();
+            
+            // Garantizar que la vista de la camiseta se dibuja después de cargar la fuente
+            if ("fonts" in document) {
+                document.fonts.ready.then(() => {
+                    if (currentJerseyPlayer) updateJerseyDisplay(currentJerseyPlayer.numero);
+                });
+            }
         });
 
         function toggleSettings() {
-            const panel = document.getElementById('settings-panel');
-            panel.classList.toggle('hidden');
+            document.getElementById('settings-panel').classList.toggle('hidden');
         }
 
         function saveScriptUrl() {
@@ -298,8 +304,7 @@
             setConnectionStatus('loading');
             try {
                 const response = await fetch(SCRIPT_URL);
-                if (!response.ok) throw new Error("Network response was not ok");
-                
+                if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
                 
                 if (data && Array.isArray(data) && data.length > 0) {
@@ -312,15 +317,12 @@
                 renderPlayers();
                 updateJerseySelect();
             } catch (error) {
-                console.error("Error cargando datos:", error);
                 setConnectionStatus('error');
                 players = [...INITIAL_PLAYERS];
                 renderPlayers();
                 updateJerseySelect();
             }
         }
-
-        loadPlayers();
 
         async function runAction(actionName, payload) {
             setConnectionStatus('loading'); 
@@ -331,18 +333,14 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: actionName, ...payload })
                 });
-                
                 const result = await response.json();
-                
                 if (result.success) {
                     setConnectionStatus('online'); 
                 } else {
-                    console.error("Error desde Apps Script:", result.error);
                     setConnectionStatus('error');
                     alert("Error en el servidor: " + (result.error || "Desconocido"));
                 }
             } catch (error) {
-                console.error(`Error ejecutando acción [${actionName}]:`, error);
                 setConnectionStatus('error');
             }
         }
@@ -404,6 +402,7 @@
                 select.appendChild(opt);
             });
             select.value = currentVal;
+            if (currentVal) updateJerseyDisplay(currentVal);
         }
 
         // =======================================================================
@@ -412,7 +411,7 @@
         function transformName(name) {
             if (!name) return '';
             
-            // Eliminar tildes y acentos automáticamente (ej: Martín -> Martin)
+            // Eliminar tildes y acentos automáticamente (ej: Martín -> MARTIN)
             let nameSinTildes = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             
             const n = nameSinTildes.toLowerCase().trim();
@@ -440,46 +439,46 @@
             controls.classList.remove('hidden');
             document.getElementById('preview-text-label').innerText = transformName(player.nombre);
 
-            // TEXTO FRENTE
+            // TAMAÑOS REDUCIDOS PARA LA FUENTE BASKETBALL ORIGINAL
             const is420 = String(player.numero) === '420';
-            const fSize = is420 ? 300 : 390;
-            const fLen = is420 ? 480 : '';
+            const fSize = is420 ? 280 : 350;
+            const fLen = is420 ? 400 : '';
 
+            // Frente: Coordenada 'y' ajustada a 1460 (El punto dulce intermedio)
             frontGroup.innerHTML = `
-                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white" stroke="white" stroke-width="43" stroke-join="round" paint-order="stroke">${player.numero}</text>
-                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="black" stroke="black" stroke-width="27" stroke-join="round" paint-order="stroke">${player.numero}</text>
-                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white">${player.numero}</text>
+                <text x="872" y="1460" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white" stroke="white" stroke-width="35" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="872" y="1460" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="black" stroke="black" stroke-width="20" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="872" y="1460" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white">${player.numero}</text>
             `;
 
-            // TEXTO ESPALDA
-            const bSize = is420 ? 420 : 625;
-            const bLen = is420 ? 650 : '';
+            // Espalda: Tamaños adaptados al bloque masivo de la tipografía "Basketball"
+            const bSize = is420 ? 380 : 550;
+            const bLen = is420 ? 550 : '';
             const tName = transformName(player.nombre);
 
-            // Ajustes estrictos de tamaño para nombres en la espalda (Ej: SEBASTIÁN)
-            let nameFontSize = 200;
+            let nameFontSize = 160;
             let nameTextLength = '';
             
-            if (tName.length >= 9) { // Nombres muy largos 
+            if (tName.length >= 9) { 
+                nameFontSize = 100; 
+                nameTextLength = 'textLength="650" lengthAdjust="spacingAndGlyphs"'; 
+            } else if (tName.length >= 7) { 
                 nameFontSize = 130; 
                 nameTextLength = 'textLength="700" lengthAdjust="spacingAndGlyphs"'; 
-            } else if (tName.length >= 7) { // Nombres moderadamente largos
-                nameFontSize = 160; 
-                nameTextLength = 'textLength="800" lengthAdjust="spacingAndGlyphs"'; 
             }
 
+            // Espalda: Curva elevada a 780/580 y el número ajustado a 1240 para subirlo "un pelo"
             backGroup.innerHTML = `
-                <path id="name-path-h" d="M 320,740 Q 873,518 1426,740" fill="none" />
+                <path id="name-path-h" d="M 320,780 Q 873,580 1426,780" fill="none" />
                 <text font-size="${nameFontSize}" fill="white">
                     <textPath href="#name-path-h" startOffset="50%" text-anchor="middle" ${nameTextLength}>${tName}</textPath>
                 </text>
-                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white" stroke="white" stroke-width="56" stroke-join="round" paint-order="stroke">${player.numero}</text>
-                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="black" stroke="black" stroke-width="34" stroke-join="round" paint-order="stroke">${player.numero}</text>
-                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white">${player.numero}</text>
+                <text x="873" y="1240" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white" stroke="white" stroke-width="45" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="873" y="1240" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="black" stroke="black" stroke-width="28" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="873" y="1240" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white">${player.numero}</text>
             `;
         }
 
-        // --- Interaction ---
         document.getElementById('add-form').onsubmit = async (e) => {
             e.preventDefault();
             const n = document.getElementById('new-number').value;
@@ -490,7 +489,6 @@
             document.getElementById('add-form').reset();
             renderPlayers();
             updateJerseySelect();
-            
             await runAction('add', { numero: n, nombre: m });
         };
 
@@ -498,7 +496,6 @@
             const p = players[idx];
             p.confirmado = !p.confirmado;
             renderPlayers(); 
-            
             const action = p.confirmado ? 'confirm' : 'unconfirm';
             await runAction(action, { numero: p.numero, nombre: p.nombre });
         }
@@ -509,7 +506,6 @@
             players.splice(idx, 1);
             renderPlayers();
             updateJerseySelect();
-            
             await runAction('delete', { numero: p.numero, nombre: p.nombre });
         }
 
