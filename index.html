@@ -285,7 +285,7 @@
             const dot = document.getElementById('status-dot');
             if (status === 'loading') {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse ml-1";
-                dot.title = "Cargando...";
+                dot.title = "Sincronizando con Google Sheets...";
             } else if (status === 'online') {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] ml-1";
                 dot.title = "Conectado y Sincronizado";
@@ -300,10 +300,13 @@
             setConnectionStatus('loading');
             try {
                 const response = await fetch(SCRIPT_URL);
+                // Si la URL es incorrecta o Apps Script da un error, no devolverá JSON
+                if (!response.ok) throw new Error("Network response was not ok");
+                
                 const data = await response.json();
                 
                 // Si hay datos en la hoja, los usamos. Si no, usamos la plantilla original.
-                if (data && data.length > 0) {
+                if (data && Array.isArray(data) && data.length > 0) {
                     players = data;
                     setConnectionStatus('online');
                 } else {
@@ -327,16 +330,27 @@
 
         // 2. Función genérica para enviar acciones a Google Sheets
         async function runAction(actionName, payload) {
+            setConnectionStatus('loading'); // Mostrar que estamos guardando
             try {
-                await fetch(SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: actionName, ...payload }),
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    }
+                    // Importante: Apps Script maneja mejor las redirecciones POST con text/plain
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: actionName, ...payload })
                 });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    setConnectionStatus('online'); // Todo bien
+                } else {
+                    console.error("Error desde Apps Script:", result.error);
+                    setConnectionStatus('error'); // Falló en el servidor
+                    alert("Error al guardar online: " + (result.error || "Desconocido"));
+                }
             } catch (error) {
                 console.error(`Error ejecutando acción [${actionName}]:`, error);
+                setConnectionStatus('error');
             }
         }
 
