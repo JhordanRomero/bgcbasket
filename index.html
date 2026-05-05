@@ -10,13 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 1. CARGA NATIVA DE FUENTE PARA LA VISTA EN PANTALLA (Tu idea implementada) */
+        /* CARGA NATIVA Y DIRECTA DE LA FUENTE DESDE TU GITHUB */
         @font-face {
             font-family: 'Basketball';
             src: url('./Basketball.woff') format('woff');
             font-weight: normal;
             font-style: normal;
-            font-display: swap;
+            font-display: swap; /* Muestra una fuente genérica mientras descarga, y luego hace el cambiazo */
         }
 
         :root {
@@ -166,14 +166,7 @@
                                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Vista Previa Texto</p>
                                 <p id="preview-text-label" class="text-xl font-black text-gray-900 uppercase font-basketball">---</p>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="downloadJersey('FRONT')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl hover:border-black transition-all">
-                                    <span class="text-[9px] font-bold uppercase text-gray-600">Guardar Frente</span>
-                                </button>
-                                <button onclick="downloadJersey('BACK')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl hover:border-black transition-all">
-                                    <span class="text-[9px] font-bold uppercase text-gray-600">Guardar Espalda</span>
-                                </button>
-                            </div>
+                            <!-- He removido los botones de guardar imagen ya que ahora se tomarán capturas -->
                         </div>
                     </div>
                 </div>
@@ -188,9 +181,6 @@
                     </div>
                     <div class="p-6 bg-white flex justify-center">
                         <svg id="svg-front" viewBox="0 0 1745 3538" class="w-full h-auto drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <style id="svg-front-style"></style>
-                            </defs>
                             <image href="https://i.imgur.com/weGeNrV.png" x="0" y="0" width="1745" height="3538" preserveAspectRatio="none" />
                             <g id="front-text-group" class="font-basketball"></g>
                         </svg>
@@ -204,9 +194,6 @@
                     </div>
                     <div class="p-6 bg-white flex justify-center">
                         <svg id="svg-back" viewBox="0 0 1746 3538" class="w-full h-auto drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <style id="svg-back-style"></style>
-                            </defs>
                             <image href="https://i.imgur.com/96It2gz.png" x="0" y="0" width="1746" height="3538" preserveAspectRatio="none" />
                             <g id="back-text-group" class="font-basketball"></g>
                         </svg>
@@ -244,59 +231,7 @@
     <!-- Scripts -->
     <script>
         // =======================================================================
-        // 1. SISTEMA DINÁMICO DE FUENTES PARA DESCARGA DE IMAGEN (Exportación)
-        // =======================================================================
-        // Convertimos buffer a base64 (Más seguro que FileReader en móviles)
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return window.btoa(binary);
-        }
-
-        async function prepareFontForExport() {
-            async function injectFontFromUrl(url) {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("No se encontró el archivo woff");
-                
-                const buffer = await response.arrayBuffer();
-                const base64 = arrayBufferToBase64(buffer);
-                
-                // Inyectamos la fuente SÓLO a los SVGs para que al exportar a imagen, la reconozca
-                const fontCSS = `
-                    @font-face {
-                        font-family: 'Basketball';
-                        src: url(data:font/woff;base64,${base64}) format('woff');
-                        font-weight: normal;
-                        font-style: normal;
-                    }
-                `;
-                document.getElementById('svg-front-style').innerHTML = fontCSS;
-                document.getElementById('svg-back-style').innerHTML = fontCSS;
-            }
-
-            try {
-                // Intento 1: Ruta local (Funciona perfecto en GitHub Pages)
-                await injectFontFromUrl('./Basketball.woff');
-            } catch (error) {
-                console.warn("Fallo carga de tipografía local. Intentando plan de emergencia...");
-                try {
-                    // Intento 2: Ruta directa "Cruda" desde el repositorio si lo anterior falla
-                    await injectFontFromUrl('https://raw.githubusercontent.com/JhordanRomero/bgcbasket/main/Basketball.woff');
-                } catch (err2) {
-                    console.error("No se pudo cargar la fuente para la exportación de la imagen.", err2);
-                }
-            }
-        }
-
-        // Ejecutar preparación silenciosa al cargar la página
-        prepareFontForExport();
-
-
-        // =======================================================================
-        // 2. LÓGICA DE BASE DE DATOS Y ESTADOS
+        // LÓGICA DE BASE DE DATOS Y ESTADOS
         // =======================================================================
         let SCRIPT_URL = localStorage.getItem('bgc_script_url') || 'https://script.google.com/macros/s/AKfycbzNc7Md5rJmrgYBk_ZDrpmJlq7wk3pciD5Wjl7kV5dCS0Rl3PB0puUJGgz32eNiYyvlUw/exec';
         
@@ -472,7 +407,7 @@
         }
 
         // =======================================================================
-        // 3. RENDERIZADO DE CAMISETA (Lógica Visual)
+        // RENDERIZADO DE CAMISETA (Lógica Visual)
         // =======================================================================
         function transformName(name) {
             if (!name) return '';
@@ -537,30 +472,6 @@
                 <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="black" stroke="black" stroke-width="34" stroke-join="round" paint-order="stroke">${player.numero}</text>
                 <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} fill="white">${player.numero}</text>
             `;
-        }
-
-        async function downloadJersey(type) {
-            const svg = document.getElementById(type === 'FRONT' ? 'svg-front' : 'svg-back');
-            const canvas = document.createElement('canvas');
-            canvas.width = 1745;
-            canvas.height = 3538;
-            const ctx = canvas.getContext('2d');
-            
-            const xml = new XMLSerializer().serializeToString(svg);
-            const svg64 = btoa(unescape(encodeURIComponent(xml)));
-            const img = new Image();
-            img.src = 'data:image/svg+xml;base64,' + svg64;
-            
-            img.onload = () => {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-                const url = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = `BGC_${currentJerseyPlayer.nombre.toUpperCase()}_${currentJerseyPlayer.numero}_${type}.png`;
-                link.href = url;
-                link.click();
-            };
         }
 
         // --- Interaction ---
