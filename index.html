@@ -3,580 +3,567 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGC Team - Camisetas</title>
-    <!-- Tailwind CSS para el diseño -->
+    <title>BGC Team - Manager & Customizer</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        .spinner { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .hidden { display: none !important; }
-        
-        /* Ajuste para que los botones de acción no rompan el layout en móviles muy pequeños */
-        @media (max-width: 400px) {
-            .action-buttons { flex-wrap: wrap; justify-content: flex-end; }
+        @font-face {
+            font-family: 'Basketball';
+            src: url(data:font/otf;base64,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dW1mbGV4VWNpcmN1bWZsZXhhY2lyY3VtZmxleGVjaXJjdW1mbGV4aWNpcmN1bWZsZXhvY2lyY3VtZmxleHVjaXJjdW1mbGV4aWRvdGxlc3NncmF2ZWNvbWJhY3V0ZWNvbWJjaXJjdW1mbGV4Y29tYnRpbGRlY29tYm1hY3JvbmNvbWJkb3RhY3SjbGllcmVzaXNjb21icmluZ2NvbWJjYXJvbmNvbWJjZWRpbGxhY29tYmZyZW5jaGZyYW5jc2lnbmxpcmFzaWducGVzZXRhc2lnbmV1cm9udW1lcm9zaWducGFydGlhbGRpZmZlcmVudGlhbGluY3JlbWVudG5hcnlwcm9kdWN0bmFyeXN1bW1hdGlvbnNxdWFyZXJvb3RpbmZpbml0eWludGVncmFsYWxtb3N0ZXF1YWx0b2xlc3N0aGFub3JlcXVhbHRvZ3JlYXRlcnRoYW5vcmVxdWFsdG8xLjAwMEhvcml6b24gU3R1ZGlvLiAyMDIwLiBBbGwgUmlnaHRzIFJlc2VydmVkQmFza2V0YmFsbAAAAAAAAAEAAgADAAQABQAGAAcAaAAJAAoACwAMAA0BhwAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAfABCAEMARABFAEYARwBIAEkASgBLAEwATQBOAE8AUABRAFIAUwBUAFUAVgBXAFgAWQBaAFsAXABdAF4AXwBgAGEAYgBnAGQAoABmAIMAqgCLAGoAlwClAIAAoQCcAKQAqQB9AJgAcwByAIUAlgCPAHgAngCbAKMAewCuAKsBiACwAK0ArwCKALEAtQCyAYkAtAC5ALYBigC4AJoAugC+ALsBiwC/AL0AqACNAMQAwQGMAMMAxQCdAJUAywDIAY0AzQDKAMwAkADOANIAzwGOANEA1gDTAY8A1QCnANcA2wDYAZAA3ADaAJ8AkwDhAN4BkQDgAOIAogDjAZIBkwGUAZUBlgGXAZgBmQGaAZsBnABvAIkAQQAIAHUAaQB3AHYAcABxAHQAeQBrAGwAYwGdAZ4BnwGgAaEAmQGiAaMBpAGlAKYBpgGnAagBqQGqAasA6QIAAQAEAAYAWwCsAeoC0QLUAtcC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) format('opentype');
+            font-display: block;
         }
+
+        :root {
+            --bg-0: #f9fafb;
+            --bg-1: #ffffff;
+            --bg-2: #f3f4f6;
+            --bg-3: #e5e7eb;
+            --line: #e2e8f0;
+            --text: #1e293b;
+            --text-dim: #64748b;
+            --accent: #0f172a;
+        }
+
+        body {
+            background-color: var(--bg-0);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-basketball {
+            font-family: 'Basketball', sans-serif;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-800 font-sans pb-12">
+<body class="min-h-screen">
 
     <!-- Header -->
     <header class="bg-white text-gray-900 py-5 shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-                <div class="flex items-center gap-3">
-                    <img src="https://i.imgur.com/qmyXSwI.png" alt="BGC Logo" class="w-20 sm:w-24 h-auto object-contain shrink-0 invert">
-                    <div>
-                        <p class="text-gray-800 text-[10px] sm:text-xs font-bold tracking-[0.25em] mb-0.5 mt-1">BASKETBALL</p>
-                        <p class="text-gray-500 text-xs sm:text-sm">Gestión de Camisetas Oficiales</p>
-                    </div>
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <img src="https://i.imgur.com/qmyXSwI.png" alt="BGC Logo" class="w-20 sm:w-24 h-auto object-contain invert">
+                <div>
+                    <p class="text-gray-800 text-[10px] sm:text-xs font-bold tracking-[0.25em] mb-0.5 mt-1">BASKETBALL</p>
+                    <p class="text-gray-500 text-xs sm:text-sm">Gestión de Camisetas Oficiales</p>
                 </div>
-                <div class="w-full sm:w-auto flex justify-between sm:flex-col items-center sm:items-end border-t border-gray-100 sm:border-0 pt-3 sm:pt-0 mt-1 sm:mt-0">
-                    <p class="text-base sm:text-lg font-bold text-black">Valor: $24.990</p>
-                    <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-500">
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                            <span class="hidden sm:inline">Sistema Online</span>
-                            <span class="sm:hidden">Online</span>
-                        </div>
-                        <button id="toggle-config-btn" class="text-gray-400 hover:text-gray-800 transition-colors bg-gray-100 p-1.5 rounded-md" title="Configurar conexión">
-                            <i data-lucide="settings" class="w-4 h-4"></i>
+            </div>
+            
+            <div class="flex flex-col items-center sm:items-end gap-3">
+                <div class="flex items-center gap-3">
+                    <p class="text-lg font-bold text-black leading-none">Valor: $27.990</p>
+                    <div class="flex items-center gap-1.5 bg-gray-50 p-1 rounded-md">
+                        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-gray-300 ml-1" title="Cargando..."></span>
+                        <button onclick="toggleSettings()" class="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors" title="Configurar Base de Datos">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.61a86.68,86.68,0,0,0-29.56-17.07l-9.11-22.06A8,8,0,0,0,145.43,24h-34.9a8,8,0,0,0-7.36,4.83l-9.11,22.06a86.68,86.68,0,0,0-29.56,17.07l-23.72,2.61a8,8,0,0,0-6,3.93,107.21,107.21,0,0,0-10.88,26.25,8,8,0,0,0,1.48,7.06L40,125.84q-.06,2.16,0,4.32L25.08,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.61a86.68,86.68,0,0,0,29.56,17.07l9.11,22.06A8,8,0,0,0,110.57,232h34.9a8,8,0,0,0,7.36-4.83l9.11-22.06a86.68,86.68,0,0,0,29.56-17.07l23.72-2.61a8,8,0,0,0,6-3.93,107.21,107.21,0,0,0,10.88-26.25,8,8,0,0,0-1.48-7.06ZM162.73,183a8,8,0,0,0-5.46,3.9c-6.87,11.53-17.21,19.92-29.69,24.1A8,8,0,0,0,122.25,216h-16.5a8,8,0,0,0-5.33-4.93c-12.48-4.18-22.82-12.57-29.69-24.1a8,8,0,0,0-5.46-3.9l-18-2c-4.2-7.8-7.5-16.14-9.8-24.81l11.45-14.31a8,8,0,0,0,1.86-6c-1.39-13.46-1.39-26.47,0-39.93a8,8,0,0,0-1.86-6L38.45,75.76c2.3-8.67,5.6-17,9.8-24.81l18-2a8,8,0,0,0,5.46-3.9c6.87-11.53,17.21-19.92,29.69-24.1A8,8,0,0,0,105.75,16h16.5a8,8,0,0,0,5.33,4.93c12.48,4.18,22.82,12.57,29.69,24.1a8,8,0,0,0,5.46,3.9l18,2c4.2,7.8,7.5,16.14,9.8,24.81l-11.45,14.31a8,8,0,0,0-1.86,6c1.39,13.46,1.39,26.47,0,39.93a8,8,0,0,0,1.86,6l11.45,14.31c-2.3,8.67-5.6,17-9.8,24.81Z"></path></svg>
                         </button>
                     </div>
+                </div>
+                <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+                    <button onclick="switchTab('payments')" id="btn-tab-payments" class="px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all bg-white text-gray-900 shadow-sm border border-gray-200">PAGOS</button>
+                    <button onclick="switchTab('jersey')" id="btn-tab-jersey" class="px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all text-gray-500 hover:text-gray-800">DISEÑO</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-6">
-        
-        <!-- Panel de Configuración de Link -->
-        <div id="config-panel" class="hidden bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6 transition-all">
-            <h2 class="text-base font-bold flex items-center gap-2 mb-3 text-slate-800">
-                <i data-lucide="link" class="text-blue-500 w-4 h-4"></i>
+    <main class="max-w-6xl mx-auto px-4 mt-6">
+        <!-- PANEL DE CONFIGURACIÓN BD -->
+        <div id="settings-panel" class="hidden mb-6 bg-white p-5 rounded-xl border border-gray-200 shadow-sm transition-all">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-slate-800 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="text-blue-600" viewBox="0 0 256 256"><path d="M141.66,114.34a8,8,0,0,1,0,11.32l-32,32a32,32,0,1,1-45.25-45.26l32-32a8,8,0,0,1,11.31,11.32l-32,32a16,16,0,0,0,22.62,22.62l32-32A8,8,0,0,1,141.66,114.34Zm86.28-40.63a48,48,0,0,0-67.88,0l-32,32a8,8,0,0,0,11.31,11.32l32-32a32,32,0,0,1,45.25,45.26l-32,32a8,8,0,0,0,11.31,11.32l32-32A48,48,0,0,0,227.94,73.71Z"></path></svg>
                 Conectar Base de Datos (Google Apps Script)
-            </h2>
+            </h3>
             <div class="flex flex-col sm:flex-row gap-3">
-                <input 
-                    type="url"
-                    id="api-url-input"
-                    placeholder="Pega aquí el link de tu Web App (https://script.google.com/...)"
-                    class="flex-1 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
-                >
-                <button 
-                    id="save-url-btn"
-                    class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                >
-                    Guardar
-                </button>
+                <input type="text" id="script-url-input" class="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-slate-500 transition-colors" placeholder="https://script.google.com/macros/s/.../exec">
+                <button onclick="saveScriptUrl()" class="bg-[#111827] text-white px-8 py-2.5 rounded-lg text-sm font-semibold hover:bg-black transition-colors shrink-0">Guardar</button>
             </div>
         </div>
 
-        <!-- Alerta de Error -->
-        <div id="error-alert" class="hidden bg-red-50 text-red-700 p-3 rounded-lg flex items-start gap-3 mb-6 border border-red-200">
-            <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-            <p id="error-message" class="text-sm leading-relaxed"></p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-            
-            <!-- Columna Izquierda: Estadísticas y Formulario -->
-            <div class="md:col-span-1 space-y-5 sm:space-y-6">
-                
-                <!-- Stats -->
-                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Resumen</h3>
-                    <div class="space-y-3 text-sm sm:text-base">
+        <!-- VISTA PAGOS -->
+        <div id="view-payments" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Resumen</h3>
+                    <div class="space-y-3">
                         <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Total Jugadores:</span>
-                            <span id="stat-total" class="font-bold">0</span>
+                            <span class="text-sm text-gray-600">Total Jugadores:</span>
+                            <span id="stat-total" class="font-bold text-gray-800">0</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Confirmados:</span>
+                            <span class="text-sm text-gray-600">Confirmados:</span>
                             <span id="stat-confirmed" class="font-bold text-green-600">0</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Pendientes:</span>
+                            <span class="text-sm text-gray-600">Pendientes:</span>
                             <span id="stat-pending" class="font-bold text-orange-500">0</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Formulario -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <!-- Cabecera colapsable en móvil -->
-                    <div id="toggle-form-btn" class="p-4 sm:p-5 flex justify-between items-center cursor-pointer sm:cursor-default bg-gray-50 sm:bg-white border-b sm:border-0 border-gray-200">
-                        <h3 class="text-base font-bold flex items-center gap-2 text-slate-800">
-                            <i data-lucide="user-plus" class="text-black w-4 h-4"></i>
-                            Añadir Jugador
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                             AÑADIR JUGADOR
                         </h3>
-                        <i data-lucide="chevron-down" id="form-chevron" class="w-5 h-5 text-gray-500 sm:hidden transition-transform duration-300"></i>
                     </div>
-                    
-                    <div id="add-form-container" class="hidden sm:block p-4 sm:p-5 sm:pt-0">
-                        <form id="add-form" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Número</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="hash" class="text-gray-400 w-4 h-4"></i>
-                                    </div>
-                                    <input 
-                                        type="number" 
-                                        id="new-number"
-                                        required
-                                        class="w-full pl-9 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
-                                        placeholder="Ej: 10"
-                                    >
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nombre</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="user" class="text-gray-400 w-4 h-4"></i>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        id="new-name"
-                                        required
-                                        class="w-full pl-9 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
-                                        placeholder="Ej: Messi"
-                                    >
-                                </div>
-                            </div>
-                            <button 
-                                type="submit"
-                                id="submit-btn"
-                                class="w-full bg-slate-900 hover:bg-slate-800 text-white p-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
-                            >
-                                <span id="submit-text">Añadir a la lista</span>
-                                <i data-lucide="refresh-cw" id="submit-spinner" class="w-4 h-4 hidden spinner"></i>
-                            </button>
-                        </form>
-                    </div>
+                    <form id="add-form" class="p-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Número</label>
+                            <input type="number" id="new-number" required class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-slate-800 outline-none" placeholder="Ej: 10">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nombre</label>
+                            <input type="text" id="new-name" required class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-slate-800 outline-none" placeholder="Nombre">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white py-2.5 rounded-lg text-xs font-bold tracking-widest transition-all">AÑADIR</button>
+                    </form>
                 </div>
+
+                <button onclick="resetToInitial()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-500 py-2 rounded-lg text-[10px] font-bold tracking-widest transition-all">REINICIAR A ORIGINAL</button>
             </div>
 
-            <!-- Columna Derecha: Lista de Jugadores -->
+            <!-- Listado -->
             <div class="md:col-span-2">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full max-h-[800px]">
-                    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
-                        <h2 class="font-bold text-base text-slate-800">Lista de Equipo</h2>
-                        <button 
-                            onclick="fetchData()"
-                            id="refresh-btn"
-                            class="text-gray-500 hover:text-black transition-colors p-1.5 rounded-md disabled:opacity-50"
-                            title="Actualizar lista"
-                        >
-                            <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full max-h-[700px]">
+                    <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h2 class="font-bold text-base text-slate-800 uppercase tracking-tight">Plantilla actual</h2>
+                        <button onclick="renderPlayers()" class="p-1.5 text-gray-500 hover:text-black transition-colors rounded-md bg-white border border-gray-200">
+                            REFRESCAR
                         </button>
                     </div>
-                    
-                    <div id="loading-state" class="p-10 text-center text-gray-500 flex flex-col items-center">
-                        <i data-lucide="refresh-cw" class="w-8 h-8 mb-3 text-gray-400 spinner"></i>
-                        <p class="text-sm">Cargando base de datos...</p>
+                    <div id="player-list" class="overflow-y-auto custom-scrollbar divide-y divide-gray-100">
+                        <!-- JS Render -->
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div id="empty-state" class="p-10 text-center text-gray-500 hidden">
-                        <p class="text-sm">No hay jugadores en la lista aún.</p>
+        <!-- VISTA DISEÑO -->
+        <div id="view-jersey" class="hidden grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+            <div class="space-y-6 self-start sticky top-24">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 text-lg uppercase mb-6 border-b border-gray-100 pb-2">Configuración</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Seleccionar Jugador</label>
+                            <select id="jersey-player-select" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-bold focus:border-black outline-none">
+                                <option value="">Elige un jugador...</option>
+                            </select>
+                        </div>
+                        <div id="jersey-controls" class="hidden space-y-4">
+                            <div class="p-4 bg-gray-100 rounded-xl border border-dashed border-gray-300 text-center">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Vista Previa Texto</p>
+                                <p id="preview-text-label" class="text-xl font-black text-gray-900 uppercase">---</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="downloadJersey('FRONT')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl hover:border-black transition-all">
+                                    <span class="text-[9px] font-bold uppercase text-gray-600">Guardar Frente</span>
+                                </button>
+                                <button onclick="downloadJersey('BACK')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl hover:border-black transition-all">
+                                    <span class="text-[9px] font-bold uppercase text-gray-600">Guardar Espalda</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-
-                    <ul id="players-list" class="divide-y divide-gray-100 overflow-y-auto hidden flex-1">
-                        <!-- Renderizado por JS -->
-                    </ul>
                 </div>
             </div>
 
+            <!-- Stage -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-xs text-gray-500 uppercase tracking-widest">FRENTE</h3>
+                    </div>
+                    <div class="p-6 bg-white flex justify-center">
+                        <svg id="svg-front" viewBox="0 0 1745 3538" class="w-full h-auto drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+                            <image href="https://i.imgur.com/weGeNrV.png" x="0" y="0" width="1745" height="3538" preserveAspectRatio="none" />
+                            <g id="front-text-group" class="font-basketball"></g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-xs text-gray-500 uppercase tracking-widest">ESPALDA</h3>
+                    </div>
+                    <div class="p-6 bg-white flex justify-center">
+                        <svg id="svg-back" viewBox="0 0 1746 3538" class="w-full h-auto drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+                            <image href="https://i.imgur.com/96It2gz.png" x="0" y="0" width="1746" height="3538" preserveAspectRatio="none" />
+                            <g id="back-text-group" class="font-basketball"></g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Modal para Editar Jugador -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 px-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
+    <!-- Modal Editar -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
             <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                    <i data-lucide="pencil" class="w-4 h-4 text-blue-500"></i>
-                    Editar Jugador
-                </h3>
-                <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-700">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <h3 class="font-bold text-gray-800 uppercase tracking-tight">Editar Jugador</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-800">&times;</button>
             </div>
-            <form id="edit-form" class="p-5 space-y-4">
-                <input type="hidden" id="edit-old-number">
-                <input type="hidden" id="edit-old-name">
-                
+            <form id="edit-form" class="p-6 space-y-4">
+                <input type="hidden" id="edit-index">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nuevo Número</label>
-                    <input 
-                        type="number" 
-                        id="edit-new-number"
-                        required
-                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nuevo Número</label>
+                    <input type="number" id="edit-number" required class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nuevo Nombre</label>
-                    <input 
-                        type="text" 
-                        id="edit-new-name"
-                        required
-                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nuevo Nombre</label>
+                    <input type="text" id="edit-name" required class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none">
                 </div>
-                <div class="flex justify-end gap-3 mt-6 pt-2">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="edit-submit-btn" class="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
-                        <span id="edit-submit-text">Guardar</span>
-                        <i data-lucide="refresh-cw" id="edit-submit-spinner" class="w-4 h-4 hidden spinner"></i>
-                    </button>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 border py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-slate-900 text-white py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Lógica de la Aplicación -->
+    <!-- Scripts -->
     <script>
-        lucide.createIcons();
+        let SCRIPT_URL = localStorage.getItem('bgc_script_url') || 'https://script.google.com/macros/s/AKfycbzNc7Md5rJmrgYBk_ZDrpmJlq7wk3pciD5Wjl7kV5dCS0Rl3PB0puUJGgz32eNiYyvlUw/exec';
         
-        const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbxzU79SFavHPSJAYRgc3E8shQZeN8e1jWoyxidWIZaJqiaGOy5EpxFr0BikZcN1GlTg/exec';
-        let API_URL = localStorage.getItem('bgc_api_url') || DEFAULT_URL;
+        // La lista original completa como respaldo
+        const INITIAL_PLAYERS = [
+            { numero: "0", nombre: "easy", confirmado: true },
+            { numero: "2", nombre: "sebastian", confirmado: false },
+            { numero: "3", nombre: "juanki", confirmado: false },
+            { numero: "4", nombre: "Novi Santos", confirmado: false },
+            { numero: "5", nombre: "Ruka", confirmado: true },
+            { numero: "6", nombre: "Estro", confirmado: true },
+            { numero: "7", nombre: "Martín", confirmado: true },
+            { numero: "8", nombre: "Fore", confirmado: true },
+            { numero: "9", nombre: "face", confirmado: false },
+            { numero: "10", nombre: "Mike Milfort", confirmado: false },
+            { numero: "11", nombre: "Gato", confirmado: true },
+            { numero: "12", nombre: "manu", confirmado: true },
+            { numero: "13", nombre: "Kun", confirmado: true },
+            { numero: "17", nombre: "jotar", confirmado: true },
+            { numero: "23", nombre: "Henry", confirmado: true },
+            { numero: "25", nombre: "fiz", confirmado: true },
+            { numero: "27", nombre: "Naiz", confirmado: true },
+            { numero: "32", nombre: "Facci", confirmado: true },
+            { numero: "33", nombre: "shakito", confirmado: true },
+            { numero: "420", nombre: "Aka", confirmado: false }
+        ];
+
         let players = [];
+        let currentJerseyPlayer = null;
 
-        // DOM Elements
-        const elList = document.getElementById('players-list');
-        const elLoading = document.getElementById('loading-state');
-        const elEmpty = document.getElementById('empty-state');
-        const elErrorAlert = document.getElementById('error-alert');
-        const elErrorMessage = document.getElementById('error-message');
-        const form = document.getElementById('add-form');
-        const editForm = document.getElementById('edit-form');
-        const editModal = document.getElementById('edit-modal');
+        // Inicializar UI de configuracion
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('script-url-input').value = SCRIPT_URL;
+        });
 
-        // UX: Colapsar formulario en móvil
-        document.getElementById('toggle-form-btn').onclick = () => {
-            if (window.innerWidth < 640) { // sm breakpoint
-                const formContainer = document.getElementById('add-form-container');
-                const chevron = document.getElementById('form-chevron');
-                formContainer.classList.toggle('hidden');
-                chevron.classList.toggle('rotate-180');
-            }
-        };
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+        }
 
-        // Panel de configuración
-        document.getElementById('toggle-config-btn').onclick = () => {
-            document.getElementById('config-panel').classList.toggle('hidden');
-            document.getElementById('api-url-input').value = API_URL;
-        };
-
-        document.getElementById('save-url-btn').onclick = () => {
-            const newUrl = document.getElementById('api-url-input').value.trim();
-            if (newUrl) {
-                API_URL = newUrl;
-                localStorage.setItem('bgc_api_url', newUrl);
-                document.getElementById('config-panel').classList.add('hidden');
-                fetchData(); 
-            }
-        };
-
-        window.onload = () => {
-            if (!API_URL) document.getElementById('config-panel').classList.remove('hidden');
-            fetchData();
-        };
-
-        function showError(msg) {
-            elErrorMessage.innerHTML = msg;
-            elErrorAlert.classList.remove('hidden');
-            if (!msg.includes('ERROR CRÍTICO')) {
-                setTimeout(() => { elErrorAlert.classList.add('hidden'); }, 12000);
+        function saveScriptUrl() {
+            const url = document.getElementById('script-url-input').value.trim();
+            if(url) {
+                SCRIPT_URL = url;
+                localStorage.setItem('bgc_script_url', url);
+                toggleSettings();
+                loadPlayers(); // Recargar datos con la nueva URL
             }
         }
 
-        async function processGoogleResponse(response) {
-            const text = await response.text();
-            try { return JSON.parse(text); } 
-            catch (e) {
-                if (text.toLowerCase().includes("<!doctype html>") || text.toLowerCase().includes("<html")) {
-                    throw new Error("<b>🚨 ERROR DE PERMISOS 🚨</b><br>Google bloqueó la solicitud. Revisa en tu Script que el acceso sea <b>'Cualquier persona'</b>.");
-                }
-                throw new Error("Respuesta inválida del servidor.");
-            }
-        }
-
-        async function fetchData() {
-            if (!API_URL) return;
-            setLoading(true);
-            try {
-                const response = await fetch(API_URL);
-                const data = await processGoogleResponse(response);
-                if (data.error) throw new Error(data.error);
-                
-                players = data.sort((a, b) => Number(a.numero) - Number(b.numero));
-                renderApp();
-            } catch (err) {
-                showError(err.message.includes('Failed to fetch') 
-                    ? "<b>🚨 ERROR (CORS) 🚨</b><br>Revisa los permisos de 'Cualquier persona' en la implementación de Apps Script." 
-                    : err.message);
-                elLoading.classList.add('hidden');
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        function renderApp() {
-            const confirmedCount = players.filter(p => p.confirmado).length;
-            document.getElementById('stat-total').textContent = players.length;
-            document.getElementById('stat-confirmed').textContent = confirmedCount;
-            document.getElementById('stat-pending').textContent = players.length - confirmedCount;
-
-            elList.innerHTML = '';
-            
-            if (players.length === 0) {
-                elEmpty.classList.remove('hidden');
-                elList.classList.add('hidden');
+        function setConnectionStatus(status) {
+            const dot = document.getElementById('status-dot');
+            if (status === 'loading') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse ml-1";
+                dot.title = "Cargando...";
+            } else if (status === 'online') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] ml-1";
+                dot.title = "Conectado y Sincronizado";
             } else {
-                elEmpty.classList.add('hidden');
-                elList.classList.remove('hidden');
-
-                players.forEach((player) => {
-                    const li = document.createElement('li');
-                    li.className = "p-3 hover:bg-gray-50 flex items-center justify-between gap-3 transition-colors group";
-                    const isConfirmed = player.confirmado === true || player.confirmado === "true" || player.confirmado === "TRUE";
-
-                    // UX Mejorada: Lista compacta
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3 w-full min-w-0">
-                            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200 shrink-0">
-                                <span class="font-black text-slate-700 text-sm">${player.numero}</span>
-                            </div>
-                            <div class="flex-1 min-w-0 flex flex-col justify-center">
-                                <p class="font-bold text-gray-800 text-sm capitalize truncate leading-tight">${player.nombre}</p>
-                                <p class="text-[11px] font-semibold mt-0.5 ${isConfirmed ? 'text-green-600' : 'text-orange-500'}">
-                                    ${isConfirmed ? '✓ CONFIRMADO' : 'PENDIENTE'}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="action-buttons flex items-center gap-1 shrink-0"></div>
-                    `;
-
-                    const actionContainer = li.querySelector('.action-buttons');
-                    
-                    // Botón Confirmar o Desconfirmar
-                    if (isConfirmed) {
-                        const unconfirmBtn = document.createElement('button');
-                        // Se soluciona el glitch fijando un ancho estable (min-w-[110px]) y usando pointer-events-none en los textos
-                        unconfirmBtn.className = "group/btn flex items-center justify-center text-green-600 bg-green-50 hover:bg-red-50 hover:text-red-600 hover:border-red-200 h-8 min-w-[110px] rounded-full text-sm font-bold border border-green-200 transition-colors cursor-pointer";
-                        unconfirmBtn.title = "Quitar confirmación";
-                        unconfirmBtn.innerHTML = `
-                            <div class="flex items-center gap-1.5 group-hover/btn:hidden pointer-events-none">
-                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                                <span>Listo</span>
-                            </div>
-                            <div class="hidden items-center gap-1.5 group-hover/btn:flex pointer-events-none">
-                                <i data-lucide="x-circle" class="w-4 h-4"></i>
-                                <span>Desmarcar</span>
-                            </div>
-                        `;
-                        unconfirmBtn.onclick = () => handleUnconfirm(player.numero, player.nombre, unconfirmBtn);
-                        actionContainer.appendChild(unconfirmBtn);
-                    } else {
-                        const confirmBtn = document.createElement('button');
-                        confirmBtn.className = "p-2 bg-white border border-gray-200 hover:border-green-500 hover:text-green-600 hover:bg-green-50 text-gray-400 rounded-lg transition-colors";
-                        confirmBtn.title = "Confirmar jugador";
-                        confirmBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 btn-icon"></i>`;
-                        confirmBtn.onclick = () => handleConfirm(player.numero, player.nombre, confirmBtn);
-                        actionContainer.appendChild(confirmBtn);
-                    }
-
-                    // Botón Editar
-                    const editBtn = document.createElement('button');
-                    editBtn.className = "p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors";
-                    editBtn.title = "Editar jugador";
-                    editBtn.innerHTML = `<i data-lucide="pencil" class="w-4 h-4"></i>`;
-                    editBtn.onclick = () => openEditModal(player.numero, player.nombre);
-                    actionContainer.appendChild(editBtn);
-
-                    // Botón Eliminar
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = "p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors";
-                    deleteBtn.title = "Eliminar jugador";
-                    deleteBtn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i>`;
-                    deleteBtn.onclick = () => handleDelete(player.numero, player.nombre);
-                    actionContainer.appendChild(deleteBtn);
-
-                    elList.appendChild(li);
-                });
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)] ml-1";
+                dot.title = "Error de conexión (Usando datos locales)";
             }
-            lucide.createIcons();
         }
 
-        // --- FUNCIONES DE ACCIÓN ---
-        async function fetchAction(actionObj, successCallback, btnElement = null) {
+        // 1. Cargar datos desde Google Sheets (REST API)
+        async function loadPlayers() {
+            setConnectionStatus('loading');
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(actionObj),
-                    redirect: 'follow'
-                });
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
                 
-                const result = await processGoogleResponse(response);
-                if (result.success) {
-                    successCallback();
+                // Si hay datos en la hoja, los usamos. Si no, usamos la plantilla original.
+                if (data && data.length > 0) {
+                    players = data;
+                    setConnectionStatus('online');
                 } else {
-                    throw new Error(result.error || "Error desconocido en el servidor");
+                    players = [...INITIAL_PLAYERS];
+                    setConnectionStatus('online');
                 }
-            } catch (err) {
-                console.error(err);
-                let errorMsg = err.message;
-                
-                if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-                    errorMsg = `<b>🚨 ERROR AL EJECUTAR LA ACCIÓN 🚨</b><br><br>Google bloqueó la función. Esto ocurre casi siempre porque agregaste nuevo código al Google Script, pero <b>no creaste una Nueva Versión</b>.<br><br><b>¿Cómo arreglarlo?</b><br>1. Ve a tu Google Apps Script.<br>2. Clic en <b>Implementar > Gestionar implementaciones</b>.<br>3. Clic en el icono del Lápiz (Editar).<br>4. En Versión, elige obligatoriamente <b>NUEVA VERSIÓN</b>.<br>5. Clic en Implementar.`;
-                }
-                
-                showError(errorMsg);
-                // Restauramos la UI para que los botones no se queden cargando infinitamente
-                renderApp(); 
+                renderPlayers();
+                updateJerseySelect();
+            } catch (error) {
+                console.error("Error cargando datos desde Sheets:", error);
+                setConnectionStatus('error');
+                // Si falla la conexión, cargar los jugadores por defecto para no mostrar en blanco
+                players = [...INITIAL_PLAYERS];
+                renderPlayers();
+                updateJerseySelect();
             }
         }
 
-        // CONFIRMAR
-        function handleConfirm(numero, nombre, btnElement) {
-            btnElement.disabled = true;
-            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner pointer-events-none"></i>`;
-            lucide.createIcons();
+        // Cargar datos al iniciar
+        loadPlayers();
 
-            fetchAction({ action: 'confirm', numero, nombre }, () => {
-                players = players.map(p => (p.numero.toString() === numero.toString() && p.nombre === nombre) ? { ...p, confirmado: true } : p);
-                renderApp();
-            }, btnElement);
+        // 2. Función genérica para enviar acciones a Google Sheets
+        async function runAction(actionName, payload) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: actionName, ...payload }),
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    }
+                });
+            } catch (error) {
+                console.error(`Error ejecutando acción [${actionName}]:`, error);
+            }
         }
 
-        // QUITAR CONFIRMACIÓN
-        function handleUnconfirm(numero, nombre, btnElement) {
-            btnElement.disabled = true;
-            btnElement.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 spinner pointer-events-none"></i>`;
-            lucide.createIcons();
-
-            fetchAction({ action: 'unconfirm', numero, nombre }, () => {
-                players = players.map(p => (p.numero.toString() === numero.toString() && p.nombre === nombre) ? { ...p, confirmado: false } : p);
-                renderApp();
-            }, btnElement);
+        function switchTab(tab) {
+            document.getElementById('view-payments').classList.toggle('hidden', tab !== 'payments');
+            document.getElementById('view-jersey').classList.toggle('hidden', tab !== 'jersey');
+            
+            document.getElementById('btn-tab-payments').className = tab === 'payments' 
+                ? 'px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all bg-white text-gray-900 shadow-sm border border-gray-200' 
+                : 'px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all text-gray-500 hover:text-gray-800';
+            
+            document.getElementById('btn-tab-jersey').className = tab === 'jersey' 
+                ? 'px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all bg-white text-gray-900 shadow-sm border border-gray-200' 
+                : 'px-6 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all text-gray-500 hover:text-gray-800';
         }
 
-        // ELIMINAR
-        function handleDelete(numero, nombre) {
-            if (!confirm(`¿Eliminar a ${nombre} (#${numero})?`)) return;
-            setLoading(true);
-            fetchAction({ action: 'delete', numero, nombre }, () => {
-                players = players.filter(p => !(p.numero.toString() === numero.toString() && p.nombre === nombre));
-                renderApp();
-                setLoading(false);
+        function renderPlayers() {
+            const list = document.getElementById('player-list');
+            list.innerHTML = '';
+            
+            document.getElementById('stat-total').innerText = players.length;
+            document.getElementById('stat-confirmed').innerText = players.filter(p => p.confirmado).length;
+            document.getElementById('stat-pending').innerText = players.filter(p => !p.confirmado).length;
+
+            players.sort((a,b) => Number(a.numero) - Number(b.numero)).forEach((p, idx) => {
+                const row = document.createElement('div');
+                row.className = 'p-3 flex items-center justify-between hover:bg-gray-50 transition-colors';
+                const safeName = p.nombre || 'SIN NOMBRE';
+                row.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200 font-black text-slate-700 text-sm">${p.numero}</div>
+                        <div>
+                            <p class="font-bold text-sm text-gray-800 uppercase leading-none">${safeName}</p>
+                            <p class="text-[11px] font-semibold mt-1 ${p.confirmado ? 'text-green-600' : 'text-orange-500'}">
+                                ${p.confirmado ? '✓ PAGADO' : 'PENDIENTE'}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="toggleConfirm(${idx})" class="p-2 rounded-lg ${p.confirmado ? 'text-green-600' : 'text-gray-400'} hover:bg-green-50 transition-all">✓</button>
+                        <button onclick="openEdit(${idx})" class="p-2 text-gray-400 hover:text-blue-600 transition-all">✎</button>
+                        <button onclick="deletePlayer(${idx})" class="p-2 text-gray-400 hover:text-red-500 transition-all">✕</button>
+                    </div>
+                `;
+                list.appendChild(row);
             });
         }
 
-        // AÑADIR
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newNumber = document.getElementById('new-number').value;
-            const newName = document.getElementById('new-name').value;
+        function updateJerseySelect() {
+            const select = document.getElementById('jersey-player-select');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">Elige un jugador...</option>';
+            players.forEach(p => {
+                const opt = document.createElement('option');
+                const safeName = p.nombre || 'SIN NOMBRE';
+                opt.value = p.numero;
+                opt.innerText = `#${p.numero} ${safeName.toUpperCase()}`;
+                select.appendChild(opt);
+            });
+            select.value = currentVal;
+        }
 
-            if (players.some(p => p.numero.toString() === newNumber.toString())) {
-                showError(`El número ${newNumber} ya está en uso.`);
+        // --- Jersey Logic ---
+        function transformName(name) {
+            if (!name) return '';
+            const n = name.toLowerCase().trim();
+            if (n === 'aka') return 'AK';
+            if (n.includes('novi')) return 'novi';
+            if (n.includes('mike')) return 'mike';
+            return name.toUpperCase();
+        }
+
+        function updateJerseyDisplay(playerNum) {
+            const player = players.find(p => p.numero === playerNum);
+            const controls = document.getElementById('jersey-controls');
+            const frontGroup = document.getElementById('front-text-group');
+            const backGroup = document.getElementById('back-text-group');
+            
+            if (!player) {
+                controls.classList.add('hidden');
+                frontGroup.innerHTML = '';
+                backGroup.innerHTML = '';
                 return;
             }
 
-            const btn = document.getElementById('submit-btn');
-            const btnText = document.getElementById('submit-text');
-            const btnSpinner = document.getElementById('submit-spinner');
+            currentJerseyPlayer = player;
+            controls.classList.remove('hidden');
+            document.getElementById('preview-text-label').innerText = transformName(player.nombre);
 
-            btn.disabled = true;
-            btnText.textContent = 'Guardando...';
-            btnSpinner.classList.remove('hidden');
+            // FRONT TEXT
+            const is420 = player.numero === '420';
+            const fSize = is420 ? 300 : 390;
+            const fLen = is420 ? 480 : '';
 
-            fetchAction({ action: 'add', numero: newNumber, nombre: newName }, async () => {
-                document.getElementById('new-number').value = '';
-                document.getElementById('new-name').value = '';
-                btn.disabled = false;
-                btnText.textContent = 'Añadir a la lista';
-                btnSpinner.classList.add('hidden');
-                
-                // Si estamos en móvil, cerramos el menú tras agregar
-                if (window.innerWidth < 640) {
-                    document.getElementById('add-form-container').classList.add('hidden');
-                    document.getElementById('form-chevron').classList.remove('rotate-180');
-                }
+            frontGroup.innerHTML = `
+                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="white" stroke="white" stroke-width="43" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="black" stroke="black" stroke-width="27" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="872" y="1362" font-size="${fSize}" ${fLen ? `textLength="${fLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="white">${player.numero}</text>
+            `;
 
-                await fetchData();
-            }, btn);
-        });
+            // BACK TEXT
+            const bSize = is420 ? 420 : 625;
+            const bLen = is420 ? 650 : '';
+            const tName = transformName(player.nombre);
 
-        // --- LÓGICA DE EDICIÓN (MODAL) ---
-        function openEditModal(numero, nombre) {
-            document.getElementById('edit-old-number').value = numero;
-            document.getElementById('edit-old-name').value = nombre;
-            document.getElementById('edit-new-number').value = numero;
-            document.getElementById('edit-new-name').value = nombre;
+            // Ajustar tamaño y compresión para nombres largos (ej. SEBASTIAN)
+            let nameFontSize = 200;
+            let nameTextLength = '';
+            if (tName.length >= 8) {
+                nameFontSize = 170; // Letra un poco más pequeña
+                nameTextLength = 'textLength="900" lengthAdjust="spacingAndGlyphs"'; // Apretar el texto en un ancho máximo
+            }
+
+            backGroup.innerHTML = `
+                <path id="name-path-h" d="M 320,740 Q 873,518 1426,740" fill="none" />
+                <text font-size="${nameFontSize}" fill="white">
+                    <textPath href="#name-path-h" startOffset="50%" text-anchor="middle" ${nameTextLength}>${tName}</textPath>
+                </text>
+                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="white" stroke="white" stroke-width="56" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="black" stroke="black" stroke-width="34" stroke-join="round" paint-order="stroke">${player.numero}</text>
+                <text x="873" y="1067" font-size="${bSize}" ${bLen ? `textLength="${bLen}" lengthAdjust="spacingAndGlyphs"` : ''} text-anchor="middle" dominant-baseline="middle" fill="white">${player.numero}</text>
+            `;
+        }
+
+        async function downloadJersey(type) {
+            const svg = document.getElementById(type === 'FRONT' ? 'svg-front' : 'svg-back');
+            const canvas = document.createElement('canvas');
+            canvas.width = 1745;
+            canvas.height = 3538;
+            const ctx = canvas.getContext('2d');
             
-            editModal.classList.remove('hidden');
+            const xml = new XMLSerializer().serializeToString(svg);
+            const svg64 = btoa(unescape(encodeURIComponent(xml)));
+            const img = new Image();
+            img.src = 'data:image/svg+xml;base64,' + svg64;
+            
+            img.onload = () => {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                const url = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `BGC_${currentJerseyPlayer.nombre.toUpperCase()}_${currentJerseyPlayer.numero}_${type}.png`;
+                link.href = url;
+                link.click();
+            };
+        }
+
+        // --- Interaction ---
+        document.getElementById('add-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const n = document.getElementById('new-number').value;
+            const m = document.getElementById('new-name').value;
+            if (players.some(p => p.numero.toString() === n.toString())) return alert('Número ocupado');
+            
+            // Actualizar interfaz instantáneamente (Optimistic UI)
+            players.push({ numero: n, nombre: m, confirmado: false });
+            document.getElementById('add-form').reset();
+            renderPlayers();
+            updateJerseySelect();
+            
+            // Enviar a Google Sheets en segundo plano
+            await runAction('add', { numero: n, nombre: m });
+        };
+
+        async function toggleConfirm(idx) {
+            const p = players[idx];
+            p.confirmado = !p.confirmado;
+            renderPlayers(); // UI al instante
+            
+            const action = p.confirmado ? 'confirm' : 'unconfirm';
+            await runAction(action, { numero: p.numero, nombre: p.nombre });
+        }
+
+        async function deletePlayer(idx) {
+            if (!confirm('¿Eliminar jugador de la base de datos?')) return;
+            const p = players[idx];
+            players.splice(idx, 1);
+            renderPlayers();
+            updateJerseySelect();
+            
+            await runAction('delete', { numero: p.numero, nombre: p.nombre });
+        }
+
+        function openEdit(idx) {
+            document.getElementById('edit-index').value = idx;
+            document.getElementById('edit-number').value = players[idx].numero;
+            document.getElementById('edit-name').value = players[idx].nombre;
+            document.getElementById('edit-modal').classList.remove('hidden');
         }
 
         function closeEditModal() {
-            editModal.classList.add('hidden');
+            document.getElementById('edit-modal').classList.add('hidden');
         }
 
-        editForm.addEventListener('submit', (e) => {
+        document.getElementById('edit-form').onsubmit = async (e) => {
             e.preventDefault();
-            const oldNumero = document.getElementById('edit-old-number').value;
-            const oldNombre = document.getElementById('edit-old-name').value;
-            const newNumero = document.getElementById('edit-new-number').value;
-            const newNombre = document.getElementById('edit-new-name').value;
-
-            // Validar que si cambia de número, el nuevo no exista en otro jugador
-            if (oldNumero !== newNumero && players.some(p => p.numero.toString() === newNumero.toString())) {
-                alert(`El número ${newNumero} ya está ocupado.`);
-                return;
-            }
-
-            const btn = document.getElementById('edit-submit-btn');
-            const btnText = document.getElementById('edit-submit-text');
-            const btnSpinner = document.getElementById('edit-submit-spinner');
-
-            btn.disabled = true;
-            btnText.textContent = 'Guardando...';
-            btnSpinner.classList.remove('hidden');
-
-            fetchAction({ action: 'edit', oldNumero, oldNombre, newNumero, newNombre }, async () => {
-                closeEditModal();
-                btn.disabled = false;
-                btnText.textContent = 'Guardar';
-                btnSpinner.classList.add('hidden');
-                await fetchData();
-            }, btn);
-        });
-
-        // --- ESTADO DE CARGA GLOBAL ---
-        function setLoading(isLoading) {
-            const refreshIcon = document.getElementById('refresh-icon');
-            const refreshBtn = document.getElementById('refresh-btn');
+            const idx = document.getElementById('edit-index').value;
+            const newNum = document.getElementById('edit-number').value;
+            const newName = document.getElementById('edit-name').value;
             
-            if (isLoading) {
-                refreshIcon.classList.add('spinner');
-                refreshBtn.disabled = true;
-                if (players.length === 0) {
-                    elLoading.classList.remove('hidden');
-                    elList.classList.add('hidden');
-                    elEmpty.classList.add('hidden');
-                }
-            } else {
-                refreshIcon.classList.remove('spinner');
-                refreshBtn.disabled = false;
-                elLoading.classList.add('hidden');
-            }
+            const p = players[idx];
+            const oldNumero = p.numero;
+            const oldNombre = p.nombre;
+            
+            p.numero = newNum;
+            p.nombre = newName;
+            closeEditModal();
+            renderPlayers();
+            updateJerseySelect();
+            
+            // Enviar edición
+            await runAction('edit', { 
+                oldNumero: oldNumero, 
+                oldNombre: oldNombre, 
+                newNumero: newNum, 
+                newNombre: newName 
+            });
+        };
+
+        document.getElementById('jersey-player-select').onchange = (e) => {
+            updateJerseyDisplay(e.target.value);
+        };
+
+        function resetToInitial() {
+            if (!confirm('Para obtener la última lista desde Google Sheets, la aplicación se recargará. Si la hoja está vacía, se cargarán los jugadores originales.')) return;
+            loadPlayers();
         }
     </script>
 </body>
